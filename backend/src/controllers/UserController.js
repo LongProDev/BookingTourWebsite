@@ -1,15 +1,18 @@
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+import User from "../models/User.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userController = {
   // Get all users
   getAllUsers: async (req, res) => {
     try {
       const users = await User.find().select("-password");
-      res.status(200).json(users);
+      res.status(200).json({
+        success: true,
+        data: users
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ success: false, message: error.message });
     }
   },
 
@@ -97,4 +100,4 @@ const userController = {
   }
 };
 
-module.exports = userController;
+export default userController;

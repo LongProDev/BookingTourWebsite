@@ -1,20 +1,18 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import Navbar from './components/common/Navbar';
-import BackToTop from './components/common/BackToTop';
-import Routes from './routes';
 
-// Import CSS
-import './assets/css/style.css';
-import './assets/lib/animate/animate.min.css';
+import Header from './components/Header/Header';
+import Routers from './routes/Routers';
+import Footer from './components/Footer/Footer';
+import './App.css';
+
 
 const App = () => {
   return (
-    <Router>
-      <Navbar />
-      <Routes />
-      <BackToTop />
-    </Router>
+    <>
+      <Header />
+      <Routers />
+      <Footer />
+    </>
   );
 };
 

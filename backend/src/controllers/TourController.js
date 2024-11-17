@@ -1,13 +1,19 @@
-const Tour = require("../models/Tour");
+import Tour from "../models/Tour.js";
 
-const tourController = {
+const TourController = {
   // Get all tours
   getAllTours: async (req, res) => {
     try {
       const tours = await Tour.find();
-      res.status(200).json(tours);
+      res.status(200).json({
+        success: true,
+        data: tours
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   },
 
@@ -29,9 +35,15 @@ const tourController = {
     try {
       const tour = new Tour(req.body);
       const newTour = await tour.save();
-      res.status(201).json(newTour);
+      res.status(201).json({
+        success: true,
+        data: newTour
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   },
 
@@ -65,7 +77,63 @@ const tourController = {
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
+  },
+
+  // Get featured tours
+  getFeaturedTours: async (req, res) => {
+    try {
+      const featuredTours = await Tour.find({ featured: true });
+      res.status(200).json({
+        success: true,
+        message: "Successfully fetched featured tours",
+        data: featuredTours
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  },
+
+  // Get tour by search
+  getTourBySearch: async (req, res) => {
+    const { location, startLocation, price } = req.query;
+    
+    try {
+      const query = {};
+      
+      if (location) query.location = { $regex: location, $options: 'i' };
+      if (startLocation) query.startLocation = { $regex: startLocation, $options: 'i' };
+      if (price) query.price = { $lte: parseInt(price) };
+
+      const tours = await Tour.find(query);
+      
+      res.status(200).json({
+        success: true,
+        message: "Successfully found tours",
+        data: tours
+      });
+    } catch (error) {
+      res.status(404).json({
+        success: false,
+        message: "Not found"
+      });
+    }
+  },
+
+  getAdminTours: async (req, res) => {
+    try {
+      const tours = await Tour.find();
+      res.status(200).json({
+        success: true,
+        message: "Successfully fetched all tours",
+        data: tours
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
   }
 };
 
-module.exports = tourController;
+export default TourController;

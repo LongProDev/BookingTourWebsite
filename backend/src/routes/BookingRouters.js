@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import bookingController from "../controllers/BookingController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+
 const router = express.Router();
-const bookingController = require("../controllers/BookingController");
-const authMiddleware = require("../middlewares/authMiddleware");
 
 router.use(authMiddleware);
 
@@ -12,4 +13,4 @@ router.post("/", bookingController.createBooking);
 router.put("/:id", bookingController.updateBooking);
 router.delete("/:id", bookingController.deleteBooking);
 
-module.exports = router;
+export default router;

@@ -6,6 +6,11 @@ const tourService = {
     return response.data;
   },
 
+  getAdminTours: async () => {
+    const response = await api.get('/tours/admin');
+    return response.data;
+  },
+
   getTourById: async (id) => {
     const response = await api.get(`/tours/${id}`);
     return response.data;

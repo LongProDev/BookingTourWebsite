@@ -1,13 +1,19 @@
-const Booking = require("../models/Booking");
+import Booking from "../models/Booking.js";
 
 const bookingController = {
   // Get all bookings
   getAllBookings: async (req, res) => {
     try {
       const bookings = await Booking.find().populate("customerId", "-password");
-      res.status(200).json(bookings);
+      res.status(200).json({
+        success: true,
+        data: bookings
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
     }
   },
 
@@ -89,4 +95,4 @@ const bookingController = {
   }
 };
 
-module.exports = bookingController;
+export default bookingController;

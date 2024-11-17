@@ -1,16 +1,21 @@
-const express = require("express");
+import express from "express";
+import tourController from "../controllers/TourController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import adminMiddleware from "../middlewares/adminMiddleware.js";
+
 const router = express.Router();
-const tourController = require("../controllers/TourController");
-const authMiddleware = require("../middlewares/authMiddleware");
 
 // Public routes
 router.get("/", tourController.getAllTours);
 router.get("/:id", tourController.getTourById);
+router.get("/search/getFeaturedTours", tourController.getFeaturedTours);
+router.get("/search/getTourBySearch", tourController.getTourBySearch);
 
-// Protected routes (admin only)
-router.use(authMiddleware);
+// Admin only routes
+router.use(authMiddleware, adminMiddleware);
+router.get("/admin", tourController.getAdminTours);
 router.post("/", tourController.createTour);
 router.put("/:id", tourController.updateTour);
 router.delete("/:id", tourController.deleteTour);
 
-module.exports = router;
+export default router;
