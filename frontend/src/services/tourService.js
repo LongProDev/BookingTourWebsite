@@ -12,8 +12,16 @@ const tourService = {
   },
 
   getTourById: async (id) => {
-    const response = await api.get(`/tours/${id}`);
-    return response.data;
+    try {
+      const response = await api.get(`/tours/${id}`);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error fetching tour:', error);
+      throw error;
+    }
   },
 
   createTour: async (tourData) => {
@@ -30,6 +38,17 @@ const tourService = {
     const response = await api.delete(`/tours/${id}`);
     return response.data;
   },
+
+  updateScheduleSeats: async (tourId, scheduleId, totalBookedSeats) => {
+    try {
+      const response = await api.patch(`/tours/${tourId}/schedules/${scheduleId}/seats`, {
+        bookedSeats: totalBookedSeats
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 };
 
 export default tourService; 

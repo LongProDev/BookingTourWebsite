@@ -82,7 +82,7 @@ const Login = () => {
                       />
                     </FormGroup>
                     <Button
-                      className="btn secondary__btn auth__btn"
+                      className="auth__btn"
                       type="submit"
                     >
                       Login

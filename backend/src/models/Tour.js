@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
 
+const scheduleSchema = new mongoose.Schema({
+  departureDate: { type: Date, required: true },
+  departureTime: { type: String, required: true },
+  returnDate: { type: Date, required: true },
+  returnTime: { type: String, required: true },
+  transportation: { type: String, required: true },
+  availableSeats: { type: Number, required: true, min: 0 },
+  price: { type: Number, required: true, min: 0 }
+});
+
 const tourSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
@@ -8,10 +18,10 @@ const tourSchema = new mongoose.Schema({
   time: { type: String, required: true },
   location: { type: String, required: true },
   maxPeople: { type: Number, required: true },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
+  date: [{ type: String, required: true }],
   startLocation: { type: String, required: true },
-  featured: { type: Boolean, default: false }
+  featured: { type: Boolean, default: false },
+  schedules: [scheduleSchema]
 });
 
 const Tour = mongoose.model("Tour", tourSchema);

@@ -8,6 +8,7 @@ import AdminBookings from '../../components/Admin/AdminBooking/Bookings.jsx';
 import AdminTours from '../../components/Admin/AdminTours/Tours.jsx';
 import AdminUsers from '../../components/Admin/AdminUsers/Users.jsx';
 import AdminReviews from '../../components/Admin/AdminReviews/Reviews.jsx';
+import AdminStatistics from '../../components/Admin/AdminStatistics/Statistics.jsx';
 
 const { TabPane } = Tabs;
 
@@ -52,6 +53,9 @@ const Dashboard = () => {
         </TabPane>
         <TabPane tab="Reviews" key="4">
           <AdminReviews />
+        </TabPane>
+        <TabPane tab="Statistics" key="5">
+          <AdminStatistics />
         </TabPane>
       </Tabs>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge } from 'reactstrap';
 import { BASE_URL } from '../../../utils/config';
+import './users.css';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -66,7 +67,7 @@ const Users = () => {
               <td>{user.username}</td>
               <td>{user.email}</td>
               <td>
-                <Badge color={user.role === 'admin' ? 'danger' : 'info'}>
+                <Badge color={user.role === 'admin' ? 'success' : 'info'}>
                   {user.role}
                 </Badge>
               </td>

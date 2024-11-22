@@ -1,0 +1,86 @@
+.admin-tours {
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.admin-tours h2 {
+  color: var(--heading-color);
+  margin-bottom: 2rem;
+}
+
+.admin-tours .table {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.admin-tours .table th {
+  background-color: #f1f1f1;
+  color: #333;
+  font-weight: 600;
+}
+
+.admin-tours .modal-content {
+  border-radius: 8px;
+}
+
+.admin-tours .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.admin-tours .form-control:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 0.2rem rgba(250, 169, 53, 0.25);
+}
+
+
+.schedule-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tour-description ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.tour-description li {
+  display: inline;
+  margin-right: 10px;
+}
+
+.tour-description li:before {
+  content: none;
+}
+
+.schedules-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.schedule-item {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.schedule-item:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-item small {
+  display: block;
+  line-height: 1.4;
+}
+
+/* Adjust the table cell width for schedules */
+.admin-tours table td:nth-child(10) {
+  min-width: 200px;
+  max-width: 250px;
+} 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge } from 'reactstrap';
 import reviewService from '../../../services/reviewService';
+import './reviews.css';
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);

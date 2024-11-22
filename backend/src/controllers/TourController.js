@@ -22,27 +22,43 @@ const TourController = {
     try {
       const tour = await Tour.findById(req.params.id);
       if (!tour) {
-        return res.status(404).json({ message: "Tour not found" });
+        return res.status(404).json({
+          success: false,
+          message: "Tour not found"
+        });
       }
       res.status(200).json(tour);
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
   },
 
   // Create new tour
   createTour: async (req, res) => {
     try {
-      const tour = new Tour(req.body);
-      const newTour = await tour.save();
+      const tourData = req.body;
+      
+      // Handle image files
+      if (req.files) {
+        const imageUrls = req.files.map(file => file.filename);
+        tourData.image = imageUrls;
+      }
+
+      const newTour = new Tour(tourData);
+      await newTour.save();
+
       res.status(201).json({
         success: true,
+        message: 'Tour created successfully',
         data: newTour
       });
     } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        message: error.message 
+      res.status(500).json({
+        success: false,
+        message: error.message
       });
     }
   },
@@ -50,19 +66,42 @@ const TourController = {
   // Update tour
   updateTour: async (req, res) => {
     try {
+      const { id } = req.params;
+      const updateData = req.body;
+
+      // Ensure schedules is always an array
+      if (updateData.schedules && !Array.isArray(updateData.schedules)) {
+        updateData.schedules = [];
+      }
+
+      if (req.files && req.files.length > 0) {
+        const imageUrls = req.files.map(file => file.filename);
+        updateData.image = imageUrls;
+      }
+
       const tour = await Tour.findByIdAndUpdate(
-        req.params.id,
-        req.body,
+        id,
+        { $set: updateData },
         { new: true }
       );
-      
+
       if (!tour) {
-        return res.status(404).json({ message: "Tour not found" });
+        return res.status(404).json({
+          success: false,
+          message: "Tour not found"
+        });
       }
-      
-      res.status(200).json(tour);
+
+      res.status(200).json({
+        success: true,
+        message: "Successfully updated tour",
+        data: tour
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
   },
 
@@ -126,6 +165,44 @@ const TourController = {
         success: true,
         message: "Successfully fetched all tours",
         data: tours
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  updateScheduleSeats: async (req, res) => {
+    try {
+      const { tourId, scheduleId } = req.params;
+      const { bookedSeats } = req.body;
+
+      const tour = await Tour.findById(tourId);
+      if (!tour) {
+        return res.status(404).json({ success: false, message: 'Tour not found' });
+      }
+
+      const schedule = tour.schedules.id(scheduleId);
+      if (!schedule) {
+        return res.status(404).json({ success: false, message: 'Schedule not found' });
+      }
+
+      schedule.availableSeats -= bookedSeats;
+      
+      if (schedule.availableSeats < 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Not enough available seats' 
+        });
+      }
+
+      await tour.save();
+      
+      res.status(200).json({
+        success: true,
+        data: schedule
       });
     } catch (error) {
       res.status(500).json({

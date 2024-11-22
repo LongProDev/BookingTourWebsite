@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge } from 'reactstrap';
 import { BASE_URL } from '../../../utils/config';
 import bookingService from '../../../services/bookingService';
+import './bookings.css';
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

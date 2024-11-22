@@ -60,7 +60,7 @@
 }
 
 .auth__btn{
-    background: var(--heading-color) !important;
+    background: var(--heading-color) ;
     width: 100%;
     color: #fff !important;
 }

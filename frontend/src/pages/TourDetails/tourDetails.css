@@ -1,0 +1,81 @@
+.tour-details {
+  padding: 80px 0;
+}
+
+.tour-summary {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 8px;
+  position: sticky;
+  top: 20px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 15px 0;
+  color: #666;
+}
+
+.summary-item i {
+  font-size: 1.1rem;
+  color: #faa935;
+}
+
+.summary-price {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.summary-price h4 {
+  color: #faa935;
+  font-size: 2rem;
+  margin-bottom: 0;
+}
+
+.summary-price span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.tour-description {
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.tour-schedules {
+  padding: 20px 0;
+}
+
+.tour-schedules table {
+  margin-top: 15px;
+}
+
+.tour-images {
+  margin-bottom: 2rem;
+}
+
+.tour-images .carousel {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tour-images .carousel-item img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  background: rgba(0,0,0,0.3);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0 20px;
+} 

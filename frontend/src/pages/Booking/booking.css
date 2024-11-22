@@ -1,0 +1,57 @@
+.booking {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.booking__btn{
+  color: var(--heading-color);
+}
+
+.booking-content {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.booking-info {
+  border-bottom: 1px solid #eee;
+}
+
+.booking-summary {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  position: sticky;
+  top: 20px;
+}
+
+.discount-code {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.summary-total {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #dee2e6;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.payment-method {
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  border-radius: 8px;
+} 

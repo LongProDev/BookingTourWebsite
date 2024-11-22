@@ -1,0 +1,29 @@
+.admin-users {
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.admin-users h2 {
+  color: var(--heading-color);
+  margin-bottom: 2rem;
+}
+
+.admin-users .table {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.admin-users .badge {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+.admin-users td {
+  vertical-align: middle;
+}
+
+.admin-users .btn-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} 
