@@ -14,6 +14,10 @@ import Login from "../pages/Login/Login.jsx";
 import Register from "../pages/Register/Register.jsx";
 import TourDetails from "../pages/TourDetails/TourDetails.jsx";
 import AdminStatistics from "../components/Admin/AdminStatistics/Statistics.jsx";
+import Account from "../pages/User/Account.jsx";
+import ProtectedRoute from "../routes/ProtectedRoute.jsx";
+import PaymentConfirmation from '../pages/Payment/PaymentConfirmation';
+import PaymentGateway from "../pages/Payment/PaymentGateway.jsx";
 
 
 const Routers = () => {
@@ -26,6 +30,8 @@ const Routers = () => {
       <Route path="/tours/:id" element={<TourDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/account" element={<ProtectedRoute noAdmin><Account /></ProtectedRoute>} />
+
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="tours" element={<AdminTours />} />
@@ -35,6 +41,8 @@ const Routers = () => {
       </Route>
 
       <Route path="/tours/:id/booking" element={<Booking />} />
+      <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
+      <Route path="/payment-gateway" element={<PaymentGateway />} />
     </Routes>
   );
 };

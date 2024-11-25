@@ -27,8 +27,13 @@ const bookingSchema = new mongoose.Schema({
   transportation: { type: String, required: true },
   tourStatus: {
     type: String,
-    enum: ["Paid", "Completed", "Canceled"],
-    default: "Paid",
+    enum: ["Pending", "Completed", "Canceled"],
+    default: "Pending",
+  },
+  paymentStatus: {
+    type: String,
+    enum: ["Pending", "Completed", "Canceled"],
+    default: "Pending",
   },
   bookingDate: { type: Date, required: true },
   discountCode: { type: String },

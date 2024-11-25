@@ -1,42 +1,32 @@
-import api from './api';
+import axios from 'axios';
+import { BASE_URL } from '../utils/config';
 
 const userService = {
-  register: async (userData) => {
-    const response = await api.post('/users/register', userData);
-    return response.data;
-  },
-
-  login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
+  updateUserInfo: async (userId, userData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${BASE_URL}/users/${userId}`,
+        userData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      return {
+        success: true,
+        data: response.data,
+        message: 'Profile updated successfully'
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Failed to update profile'
+      };
     }
-    return response.data;
-  },
-
-  logout: () => {
-    localStorage.removeItem('token');
-  },
-
-  getCurrentUser: async () => {
-    const response = await api.get('/users/me');
-    return response.data;
-  },
-
-  updateUser: async (id, userData) => {
-    const response = await api.put(`/users/${id}`, userData);
-    return response.data;
-  },
-
-  getAllUsers: async () => {
-    const response = await api.get('/users');
-    return response.data;
-  },
-
-  getUserById: async (id) => {
-    const response = await api.get(`/users/${id}`);
-    return response.data;
-  },
+  }
 };
 
 export default userService; 

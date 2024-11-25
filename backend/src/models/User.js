@@ -16,9 +16,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  phone: {
+    type: String,
+    default: "",
+  },
+  address: {
+    type: String,
+    default: "",
+  },
   role: {
     type: String,
-    enum: ["user", "admin"],
     default: "user",
   }
 }, { timestamps: true });
@@ -38,7 +45,7 @@ userSchema.pre("save", async function(next) {
     throw new Error('Password must contain at least one uppercase letter');
   }
   
-  this.password = await bcrypt.hash(this.password, 12);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 

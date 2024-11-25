@@ -67,37 +67,39 @@ const bookingController = {
         });
       }
 
-      if (schedule.availableSeats < seatsToUpdate) {
+      const totalSeats = seatsToUpdate || 
+        (bookingData.numberOfAdults + bookingData.numberOfChildren);
+
+      if (schedule.availableSeats < totalSeats) {
         return res.status(400).json({
           success: false,
           message: "Not enough seats available"
         });
       }
 
-      // Update seats
-      schedule.availableSeats -= seatsToUpdate;
-      await tour.save();
-
-      // Create booking
+      // Create booking with validated status values
       const booking = new Booking({
         ...bookingData,
         bookingDate: new Date(),
-        tourStatus: 'Paid'
+        tourStatus: 'Pending',
+        paymentStatus: 'Pending'
       });
       
       const newBooking = await booking.save();
-      const populatedBooking = await Booking.findById(newBooking._id)
-        .populate("customerId", "-password");
+
+      // Update seats after successful booking creation
+      schedule.availableSeats -= totalSeats;
+      await tour.save();
       
       res.status(201).json({
         success: true,
-        data: populatedBooking
+        data: newBooking
       });
     } catch (error) {
       console.error('Booking creation error:', error);
       res.status(500).json({
         success: false,
-        message: error.message
+        message: error.message || 'Failed to create booking'
       });
     }
   },
@@ -131,6 +133,102 @@ const bookingController = {
       res.status(200).json({ message: "Booking deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Cancel booking
+  cancelBooking: async (req, res) => {
+    try {
+      const booking = await Booking.findById(req.params.id);
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: "Booking not found"
+        });
+      }
+
+      // Update booking status
+      booking.tourStatus = 'Canceled';
+      booking.paymentStatus = 'Canceled';
+      await booking.save();
+
+      // Return seats to schedule
+      const tour = await Tour.findById(booking.tourId);
+      const schedule = tour.schedules.id(booking.scheduleId);
+      schedule.availableSeats += (booking.numberOfAdults + booking.numberOfChildren);
+      await tour.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Booking cancelled successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  // Check payment status
+  checkPaymentStatus: async (req, res) => {
+    try {
+      const booking = await Booking.findById(req.params.id);
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: "Booking not found"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        paymentStatus: booking.paymentStatus
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  // Update payment status
+  updateBookingPayment: async (req, res) => {
+    try {
+      const { paymentStatus } = req.body;
+      const bookingId = req.params.id;
+
+      if (!['Pending', 'Processing', 'Completed', 'Failed'].includes(paymentStatus)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid payment status"
+        });
+      }
+
+      const booking = await Booking.findByIdAndUpdate(
+        bookingId,
+        { paymentStatus },
+        { new: true }
+      );
+      
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: "Booking not found"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: booking
+      });
+    } catch (error) {
+      console.error('Payment update error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to update payment status'
+      });
     }
   }
 };

@@ -12,5 +12,8 @@ router.get("/customer/:customerId", bookingController.getBookingsByCustomer);
 router.post("/", bookingController.createBooking);
 router.put("/:id", bookingController.updateBooking);
 router.delete("/:id", bookingController.deleteBooking);
+router.put('/:id/cancel', authMiddleware, bookingController.cancelBooking);
+router.get('/:id/status', authMiddleware, bookingController.checkPaymentStatus);
+router.put('/:id/payment', authMiddleware, bookingController.updateBookingPayment);
 
 export default router;

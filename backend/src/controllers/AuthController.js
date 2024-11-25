@@ -51,8 +51,7 @@ const authController = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-
-      // Check if user exists
+      
       const user = await User.findOne({ email });
       if (!user) {
         return res.status(404).json({
@@ -61,37 +60,33 @@ const authController = {
         });
       }
 
-      // Check password
       const isPasswordCorrect = await user.comparePassword(password);
       if (!isPasswordCorrect) {
         return res.status(400).json({
           success: false,
-          message: "Invalid credentials"
+          message: "Incorrect email or password"
         });
       }
 
-      // Create token
       const token = jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" }
+        { expiresIn: "15d" }
       );
+
+      const { password: userPassword, ...userData } = user._doc;
 
       res.status(200).json({
         success: true,
         message: "Successfully logged in",
         token,
-        data: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          role: user.role
-        }
+        data: userData
       });
     } catch (error) {
+      console.error('Login error:', error);
       res.status(500).json({
         success: false,
-        message: error.message
+        message: "Internal server error"
       });
     }
   },

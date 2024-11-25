@@ -28,21 +28,18 @@ const Login = () => {
     try {
       const result = await authService.login(credentials);
       
-      if (result.success) {
+      if (result.data) {
         dispatch({ type: 'LOGIN_SUCCESS', payload: result.data });
-        
-        if (result.data.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/');
-        }
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('user', JSON.stringify(result.data));
+        navigate('/');
       } else {
-        alert(result.message);
         dispatch({ type: 'LOGIN_FAILURE', payload: result.message });
+        alert(result.message);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Login failed');
       dispatch({ type: 'LOGIN_FAILURE', payload: err.message });
+      alert(err.message);
     }
   };
 

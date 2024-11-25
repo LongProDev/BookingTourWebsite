@@ -1,0 +1,91 @@
+.account-settings {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.account-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn.active {
+  background: var(--heading-color);
+  color: #fff;
+}
+
+.tab-content {
+  background: transparent;
+  padding: 1rem 0;
+}
+
+/* Inherit styles from login.css */
+.login__container {
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  margin-top: 100px;
+}
+
+.login__form {
+  padding: 50px;
+  background: var(--secondary-color);
+  position: relative;
+  width: 100%;
+}
+
+.login__form .user {
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.login__form .user img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.login__form h2 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .account-settings {
+    padding: 40px 0;
+  }
+
+  .login__container {
+    margin-top: 60px;
+  }
+
+  .account-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tab-btn {
+    width: 100%;
+  }
+} 

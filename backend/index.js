@@ -13,7 +13,7 @@ import userRoute from "./src/routes/UserRouters.js";
 import authRoute from "./src/routes/AuthRouters.js";
 import bookingRoute from "./src/routes/BookingRouters.js";
 import statisticsRoute from "./src/routes/StatisticsRouters.js";
-
+import paymentRoute from "./src/routes/PaymentRouters.js";
 
 dotenv.config();
 
@@ -52,6 +52,7 @@ app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/bookings", bookingRoute);
 app.use('/api/statistics', statisticsRoute);
+app.use('/api/payments', paymentRoute);
 
 const uploadDir = path.join(process.cwd(), 'public', 'images');
 if (!fs.existsSync(uploadDir)) {

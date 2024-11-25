@@ -6,13 +6,27 @@ const userController = {
   // Get all users
   getAllUsers: async (req, res) => {
     try {
-      const users = await User.find().select("-password");
+      // Only admin can access all users
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied"
+        });
+      }
+
+      const users = await User.find()
+        .select('-password')
+        .sort({ createdAt: -1 });
+
       res.status(200).json({
         success: true,
         data: users
       });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
   },
 
@@ -66,6 +80,14 @@ const userController = {
     try {
       const { password, ...updateData } = req.body;
       
+      // Check if user is admin or updating their own profile
+      if (req.user.role !== 'admin' && req.user.id !== req.params.id) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only update your own profile"
+        });
+      }
+
       if (password) {
         updateData.password = await bcrypt.hash(password, 10);
       }
@@ -77,12 +99,21 @@ const userController = {
       ).select("-password");
 
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
       }
 
-      res.status(200).json(user);
+      res.status(200).json({
+        success: true,
+        data: user
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
   },
 

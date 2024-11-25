@@ -5,42 +5,42 @@ import logo from "../../assets/images/logo.png";
 import { AuthContext } from "../../context/AuthContext";
 import "./header.css";
 import ToursDropdown from './ToursDropdown';
-
-
-const nav__links = [
-  {
-    path: "/home",
-    display: "Home",
-  },
-  {
-    path: "/about",
-    display: "About",
-  },
-  {
-    path: "/tours",
-    display: "Tours",
-  },
-];
+import UserDropdown from './UserDropdown';
 
 const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const { user, dispatch } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const logout = () => {
-    dispatch({ type: "LOGOUT" });
-    navigate("/");
-  };
+  const nav__links = [
+    {
+      path: "/home",
+      display: "Home"
+    },
+    {
+      path: "/about",
+      display: "About"
+    },
+    {
+      path: "/tours",
+      display: "Tours"
+    }
+  ];
+
+  if (user?.role === 'admin') {
+    nav__links.push({
+      path: "/admin",
+      display: "Admin Management",
+      adminOnly: true,
+    });
+  }
 
   const stickyHeaderFunc = () => {
     const handleScroll = () => {
       if (headerRef.current) {
-        if (
-          document.body.scrollTop > 80 ||
-          document.documentElement.scrollTop > 80
-        ) {
+        if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
           headerRef.current.classList.add("sticky__header");
         } else {
           headerRef.current.classList.remove("sticky__header");
@@ -70,10 +70,7 @@ const Header = () => {
               </Link>
             </div>
 
-            <div
-              className={`navigation ${menuOpen ? "show__menu" : ""}`}
-              ref={menuRef}
-            >
+            <div className={`navigation ${menuOpen ? "show__menu" : ""}`} ref={menuRef}>
               <ul className="menu">
                 {nav__links.map((item, index) => (
                   <li className="nav__item" key={index}>
@@ -89,30 +86,16 @@ const Header = () => {
             <div className="nav__right d-flex align-items-center gap-4">
               <div className="nav__btns d-flex align-items-center gap-4">
                 {user ? (
-                  <>
-                    <h5 className="mb-0">{user.username}</h5>
-                    <Button className="btn btn-dark" onClick={logout}>
-                      Logout
-                    </Button>
-                  </>
+                  <UserDropdown />
                 ) : (
-                  <>
-                    <Button className="btn secondary__btn">
-                      <Link to="/login">Login</Link>
-                    </Button>
-                    <Button className="btn primary__btn">
-                      <Link to="/register">Register</Link>
-                    </Button>
-                  </>
+                  <Button className="btn secondary__btn">
+                    <Link to="/login">Login</Link>
+                  </Button>
                 )}
               </div>
 
               <span className="mobile__menu" onClick={toggleMenu}>
-                <i
-                  className={`ri-menu-line ${
-                    menuOpen ? "ri-close-line" : "ri-menu-line"
-                  }`}
-                ></i>
+                <i className={`ri-menu-line ${menuOpen ? "ri-close-line" : "ri-menu-line"}`}></i>
               </span>
             </div>
           </div>
