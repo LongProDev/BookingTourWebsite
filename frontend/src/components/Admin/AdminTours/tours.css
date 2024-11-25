@@ -79,8 +79,41 @@
   line-height: 1.4;
 }
 
-/* Adjust the table cell width for schedules */
-.admin-tours table td:nth-child(10) {
+
+.admin-tours table td:nth-child(9) {
   min-width: 200px;
-  max-width: 250px;
+  max-width: 300px;
+  word-wrap: break-word;
+} 
+.admin-tours table td:nth-child(10) {
+  min-width: 80px;
+  max-width: 100px;
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(8) {
+  min-width: 20px;
+  max-width: 100px;
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(2) {
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(3) {
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(4) {
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(5) {
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(6) {
+  word-wrap: break-word;
+  text-align: center;
 } 

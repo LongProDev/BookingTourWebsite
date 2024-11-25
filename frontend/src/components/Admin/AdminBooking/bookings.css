@@ -14,6 +14,13 @@
   border-radius: 8px;
 }
 
+.admin-bookings .table th {
+  background-color: #f1f1f1;
+  color: #333;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .admin-bookings .badge {
   padding: 8px 12px;
   font-size: 0.85rem;
@@ -25,8 +32,21 @@
 
 .admin-bookings td {
   vertical-align: middle;
+  font-size: 0.9rem;
 }
 
 .admin-bookings .btn {
+  white-space: nowrap;
+  margin: 2px;
+}
+
+.admin-bookings td:nth-child(9) {
+  min-width: 200px;
+}
+
+.admin-bookings .table td {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 } 

@@ -15,6 +15,11 @@ import {
 import tourService from "../../../services/tourService";
 import "./tours.css";
 
+const getImageUrl = (imagePath) => {
+  if (!imagePath) return '/images/placeholder.jpg';
+  if (imagePath.startsWith('http')) return imagePath;
+  return `${process.env.REACT_APP_API_URL}/images/${imagePath.replace(/^\/images\//, '')}`;
+};
 
 const ScheduleModal = ({
   isOpen,
@@ -23,11 +28,16 @@ const ScheduleModal = ({
   scheduleData,
   setScheduleData,
   onSubmit,
+  editScheduleId
 }) => {
+  if (!currentTour) {
+    return null;
+  }
+
   return (
     <Modal isOpen={isOpen} toggle={toggle}>
       <ModalHeader toggle={toggle}>
-        Add Schedule for {currentTour?.name}
+        {editScheduleId ? 'Edit Schedule' : 'Add Schedule'} for {currentTour?.name}
       </ModalHeader>
       <ModalBody>
         <Form onSubmit={onSubmit}>
@@ -120,50 +130,45 @@ const ScheduleModal = ({
             </Input>
           </FormGroup>
 
-          <Row>
-            <Col md={6}>
-              <FormGroup>
-                <Label>Available Seats</Label>
-                <Input
-                  type="number"
-                  value={scheduleData.availableSeats}
-                  onChange={(e) =>
-                    setScheduleData({
-                      ...scheduleData,
-                      availableSeats: e.target.value,
-                    })
-                  }
-                  min="1"
-                  required
-                />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup>
-                <Label>Price</Label>
-                <Input
-                  type="number"
-                  value={scheduleData.price}
-                  onChange={(e) =>
-                    setScheduleData({
-                      ...scheduleData,
-                      price: e.target.value,
-                    })
-                  }
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </FormGroup>
-            </Col>
-          </Row>
+          <FormGroup>
+            <Label>Available Seats</Label>
+            <Input
+              type="number"
+              min="1"
+              value={scheduleData.availableSeats}
+              onChange={(e) =>
+                setScheduleData({
+                  ...scheduleData,
+                  availableSeats: e.target.value,
+                })
+              }
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Price ($)</Label>
+            <Input
+              type="number"
+              min="0"
+              step="0.01"
+              value={scheduleData.price}
+              onChange={(e) =>
+                setScheduleData({
+                  ...scheduleData,
+                  price: e.target.value,
+                })
+              }
+              required
+            />
+          </FormGroup>
 
           <div className="d-flex justify-content-end gap-2">
             <Button color="secondary" onClick={toggle}>
               Cancel
             </Button>
             <Button color="primary" type="submit">
-              Add Schedule
+              {editScheduleId ? 'Update Schedule' : 'Add Schedule'}
             </Button>
           </div>
         </Form>
@@ -179,10 +184,10 @@ const AdminTours = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    price: "",
+    price: "0",
     time: "",
     location: "",
-    maxPeople: "",
+    maxPeople: "0",
     startLocation: "",
     featured: false,
     schedules: [],
@@ -201,6 +206,8 @@ const AdminTours = () => {
 
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+
+  const [editScheduleId, setEditScheduleId] = useState(null);
 
   useEffect(() => {
     fetchTours();
@@ -223,18 +230,37 @@ const AdminTours = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Validate required fields
+      const requiredFields = ['name', 'description', 'price', 'time', 'location', 'maxPeople', 'startLocation'];
+      const missingFields = requiredFields.filter(field => !formData[field]);
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      }
+
+      if (!currentTour && imageFiles.length === 0) {
+        throw new Error('Please upload at least one image');
+      }
+
       const formDataToSend = new FormData();
 
-      // Append tour data
+      // Append all form data except images
       Object.keys(formData).forEach((key) => {
-        if (key !== "image") {
+        if (key === 'schedules') {
+          formDataToSend.append(key, JSON.stringify(formData[key] || []));
+        } else if (key === 'price' || key === 'maxPeople') {
+          const value = parseFloat(formData[key]) || 0;
+          formDataToSend.append(key, value);
+        } else if (key === 'featured') {
+          formDataToSend.append(key, formData[key]);
+        } else if (key !== 'image') {
           formDataToSend.append(key, formData[key]);
         }
       });
 
-      // Append images
+      // Append each image file with the correct field name
       imageFiles.forEach((file) => {
-        formDataToSend.append("images", file);
+        formDataToSend.append('images', file);
       });
 
       const response = currentTour
@@ -248,7 +274,7 @@ const AdminTours = () => {
       }
     } catch (error) {
       console.error("Error saving tour:", error);
-      alert("Error saving tour: " + error.message);
+      alert(error.message);
     }
   };
 
@@ -256,10 +282,10 @@ const AdminTours = () => {
     setFormData({
       name: "",
       description: "",
-      price: "",
+      price: "0",
       time: "",
       location: "",
-      maxPeople: "",
+      maxPeople: "0",
       startLocation: "",
       featured: false,
       schedules: [],
@@ -282,40 +308,98 @@ const AdminTours = () => {
   const handleScheduleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Format dates properly
-      const departureDateTime = new Date(
-        `${scheduleData.departureDate}T${scheduleData.departureTime}`
-      );
-      const returnDateTime = new Date(
-        `${scheduleData.returnDate}T${scheduleData.returnTime}`
-      );
-
-      // Validate dates
-      if (returnDateTime <= departureDateTime) {
-        alert("Return date/time must be after departure date/time");
-        return;
+      if (!currentTour || !currentTour._id) {
+        throw new Error('Invalid tour data. Please try again.');
       }
 
+      // Debug logging
+      console.log('Schedule Data:', scheduleData);
+      
+      // Validate all required fields
+      const requiredFields = ['departureDate', 'departureTime', 'returnDate', 'returnTime', 'transportation', 'availableSeats', 'price'];
+      const missingFields = requiredFields.filter(field => !scheduleData[field]);
+      
+      if (missingFields.length > 0) {
+        console.error('Missing fields:', missingFields);
+        throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
+      }
+
+      // Validate numeric fields with detailed logging
+      console.log('Validating numeric fields...');
+      console.log('Available seats:', scheduleData.availableSeats, typeof scheduleData.availableSeats);
+      console.log('Price:', scheduleData.price, typeof scheduleData.price);
+
+      if (isNaN(scheduleData.availableSeats) || parseInt(scheduleData.availableSeats) < 1) {
+        console.error('Invalid available seats:', scheduleData.availableSeats);
+        throw new Error('Available seats must be a positive number');
+      }
+
+      if (isNaN(scheduleData.price) || parseFloat(scheduleData.price) < 0) {
+        console.error('Invalid price:', scheduleData.price);
+        throw new Error('Price must be a non-negative number');
+      }
+
+      // Format and validate dates with logging
+      console.log('Validating dates...');
+      const departureDateTime = new Date(`${scheduleData.departureDate}T${scheduleData.departureTime}`);
+      const returnDateTime = new Date(`${scheduleData.returnDate}T${scheduleData.returnTime}`);
+
+      console.log('Departure DateTime:', departureDateTime);
+      console.log('Return DateTime:', returnDateTime);
+
+      if (isNaN(departureDateTime.getTime()) || isNaN(returnDateTime.getTime())) {
+        console.error('Invalid date format:', { 
+          departure: scheduleData.departureDate, 
+          departureTime: scheduleData.departureTime,
+          return: scheduleData.returnDate,
+          returnTime: scheduleData.returnTime 
+        });
+        throw new Error('Invalid date format');
+      }
+
+      if (returnDateTime <= departureDateTime) {
+        console.error('Invalid date range:', {
+          departure: departureDateTime,
+          return: returnDateTime
+        });
+        throw new Error('Return date/time must be after departure date/time');
+      }
+
+      // Log the final schedule object
       const newSchedule = {
         ...scheduleData,
         departureDate: departureDateTime.toISOString(),
         returnDate: returnDateTime.toISOString(),
+        transportation: scheduleData.transportation,
         availableSeats: parseInt(scheduleData.availableSeats),
-        price: parseFloat(scheduleData.price),
+        price: parseFloat(scheduleData.price)
       };
+      console.log('New Schedule Object:', newSchedule);
+
+      let updatedSchedules;
+      if (editScheduleId) {
+        // Update existing schedule
+        updatedSchedules = currentTour.schedules.map(schedule => 
+          schedule._id === editScheduleId ? { ...newSchedule, _id: editScheduleId } : schedule
+        );
+      } else {
+        // Add new schedule
+        updatedSchedules = [...(currentTour.schedules || []), newSchedule];
+      }
 
       const updatedTour = {
         ...currentTour,
-        schedules: [...(currentTour.schedules || []), newSchedule],
+        schedules: JSON.stringify(updatedSchedules)
       };
+      console.log('Updated Tour Object:', updatedTour);
 
-      const response = await tourService.updateTour(
-        currentTour._id,
-        updatedTour
-      );
+      const response = await tourService.updateTour(currentTour._id, updatedTour);
+      console.log('API Response:', response);
+
       if (response.success) {
         fetchTours();
         setScheduleModal(false);
+        setEditScheduleId(null);
         setScheduleData({
           departureDate: "",
           departureTime: "",
@@ -325,10 +409,13 @@ const AdminTours = () => {
           availableSeats: "",
           price: "",
         });
+      } else {
+        console.error('API Error:', response);
+        throw new Error(response.message || 'Failed to update schedule');
       }
     } catch (error) {
-      console.error("Error adding schedule:", error);
-      alert("Failed to add schedule");
+      console.error("Error updating schedule:", error);
+      alert(error.message || "Failed to update schedule");
     }
   };
 
@@ -353,6 +440,23 @@ const AdminTours = () => {
               💺 Available Seats: {schedule.availableSeats}
               <br />
               💰 Price: ${schedule.price}
+              <br />
+              <Button
+                color="info"
+                size="sm"
+                className="me-2 mt-2"
+                onClick={() => handleEditSchedule(schedule)}
+              >
+                Edit
+              </Button>
+              <Button
+                color="danger"
+                size="sm"
+                className="mt-2"
+                onClick={() => handleDeleteSchedule(currentTour._id, schedule._id)}
+              >
+                Delete
+              </Button>
             </small>
           </div>
         ))}
@@ -367,6 +471,46 @@ const AdminTours = () => {
     // Create preview URLs
     const previewUrls = files.map((file) => URL.createObjectURL(file));
     setImagePreviewUrls(previewUrls);
+  };
+
+  const handleDeleteSchedule = async (tourId, scheduleId) => {
+    if (!window.confirm('Are you sure you want to delete this schedule?')) return;
+
+    try {
+      const updatedSchedules = currentTour.schedules.filter(
+        schedule => schedule._id !== scheduleId
+      );
+
+      const updatedTour = {
+        ...currentTour,
+        schedules: JSON.stringify(updatedSchedules)
+      };
+
+      const response = await tourService.updateTour(tourId, updatedTour);
+      if (response.success) {
+        fetchTours();
+        alert('Schedule deleted successfully');
+      } else {
+        throw new Error(response.message || 'Failed to delete schedule');
+      }
+    } catch (error) {
+      console.error('Error deleting schedule:', error);
+      alert(error.message || 'Failed to delete schedule');
+    }
+  };
+
+  const handleEditSchedule = (schedule) => {
+    setEditScheduleId(schedule._id);
+    setScheduleData({
+      departureDate: schedule.departureDate.split('T')[0],
+      departureTime: schedule.departureTime,
+      returnDate: schedule.returnDate.split('T')[0],
+      returnTime: schedule.returnTime,
+      transportation: schedule.transportation,
+      availableSeats: schedule.availableSeats,
+      price: schedule.price
+    });
+    setScheduleModal(true);
   };
 
   return (
@@ -385,7 +529,6 @@ const AdminTours = () => {
             <th>Name</th>
             <th>Location</th>
             <th>Duration</th>
-            <th>Date</th>
             <th>Price</th>
             <th>Max People</th>
             <th>Description</th>
@@ -400,7 +543,7 @@ const AdminTours = () => {
               <td>
                 {tour.image && tour.image.length > 0 ? (
                   <img
-                    src={`${process.env.REACT_APP_API_URL}/images/${tour.image[0]}`}
+                    src={getImageUrl(tour.image[0])}
                     alt={tour.name}
                     style={{
                       width: "100px",
@@ -423,7 +566,6 @@ const AdminTours = () => {
               <td>{tour.name}</td>
               <td>{tour.location}</td>
               <td>{tour.time}</td>
-              <td>{tour.date.join(", ")}</td>
               <td>${tour.price}</td>
               <td>{tour.maxPeople}</td>
               <td>{tour.description}</td>
@@ -454,11 +596,25 @@ const AdminTours = () => {
                   size="sm"
                   className="me-2"
                   onClick={() => {
+                    if (!tour) {
+                      alert('Error: Tour data is missing');
+                      return;
+                    }
                     setCurrentTour(tour);
+                    setEditScheduleId(null);
+                    setScheduleData({
+                      departureDate: "",
+                      departureTime: "",
+                      returnDate: "",
+                      returnTime: "",
+                      transportation: "",
+                      availableSeats: "",
+                      price: "",
+                    });
                     setScheduleModal(true);
                   }}
                 >
-                  Schedules
+                  Add Schedule
                 </Button>
               </td>
             </tr>
@@ -509,8 +665,21 @@ const AdminTours = () => {
                 required={!currentTour}
               />
               <div className="image-previews mt-2">
-                {imagePreviewUrls.map((url, index) => (
+                {currentTour?.image?.map((img, index) => (
                   <div key={index} className="preview-container">
+                    <img
+                      src={getImageUrl(img)}
+                      alt={`Tour ${index + 1}`}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </div>
+                ))}
+                {imagePreviewUrls.map((url, index) => (
+                  <div key={`new-${index}`} className="preview-container">
                     <img
                       src={url}
                       alt={`Preview ${index + 1}`}
@@ -591,6 +760,7 @@ const AdminTours = () => {
                   />
                 </FormGroup>
               </Col>
+              
               <Col md={6}>
                 <FormGroup>
                   <Label for="location">Destination</Label>
@@ -656,6 +826,7 @@ const AdminTours = () => {
         scheduleData={scheduleData}
         setScheduleData={setScheduleData}
         onSubmit={handleScheduleSubmit}
+        editScheduleId={editScheduleId}
       />
     </div>
   );

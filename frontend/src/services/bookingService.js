@@ -1,5 +1,4 @@
 import api from './api';
-import tourService from './tourService';
 
 const bookingService = {
   getAllBookings: async () => {
@@ -19,17 +18,14 @@ const bookingService = {
 
   createBooking: async (bookingData) => {
     try {
-      const response = await api.post('/bookings', bookingData);
-      if (response.data.success) {
-        // Update available seats after successful booking
-        await tourService.updateScheduleSeats(
-          bookingData.tourId,
-          bookingData.scheduleId,
-          bookingData.numberOfAdults + bookingData.numberOfChildren
-        );
-      }
+      // Send all data in a single request
+      const response = await api.post('/bookings', {
+        ...bookingData,
+        seatsToUpdate: bookingData.numberOfAdults + bookingData.numberOfChildren
+      });
       return response.data;
     } catch (error) {
+      console.error('Booking creation error:', error);
       throw error;
     }
   },

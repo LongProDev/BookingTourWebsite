@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge } from 'reactstrap';
-import { BASE_URL } from '../../../utils/config';
 import bookingService from '../../../services/bookingService';
 import './bookings.css';
+
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,17 +28,23 @@ const AdminBookings = () => {
 
   const handleStatusUpdate = async (id, newStatus) => {
     try {
-      await fetch(`${BASE_URL}/bookings/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({ tourStatus: newStatus })
-      });
+      await bookingService.updateBooking(id, { tourStatus: newStatus });
       fetchBookings();
     } catch (error) {
       console.error('Error updating booking:', error);
+      alert('Failed to update booking status');
+    }
+  };
+
+  const handleDeleteBooking = async (id) => {
+    if (window.confirm('Are you sure you want to delete this booking?')) {
+      try {
+        await bookingService.deleteBooking(id);
+        fetchBookings();
+      } catch (error) {
+        console.error('Error deleting booking:', error);
+        alert('Failed to delete booking');
+      }
     }
   };
 
@@ -50,11 +56,14 @@ const AdminBookings = () => {
       <Table responsive>
         <thead>
           <tr>
-            <th>Customer</th>
-            <th>Tour</th>
-            <th>Date</th>
+            <th>Customer Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Tour Name</th>
+            <th>Passengers</th>
+            <th>Booking Time</th>
+            <th>Total Price</th>
             <th>Status</th>
-            <th>Price</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -62,8 +71,15 @@ const AdminBookings = () => {
           {bookings.map((booking) => (
             <tr key={booking._id}>
               <td>{booking.customerName}</td>
+              <td>{booking.customerEmail}</td>
+              <td>{booking.customerPhone}</td>
               <td>{booking.tourName}</td>
-              <td>{new Date(booking.tourDate).toLocaleDateString()}</td>
+              <td>
+                Adults: {booking.numberOfAdults}<br/>
+                Children: {booking.numberOfChildren}
+              </td>
+              <td>{new Date(booking.bookingDate).toLocaleString()}</td>
+              <td>${booking.totalPrice}</td>
               <td>
                 <Badge color={
                   booking.tourStatus === 'Paid' ? 'warning' :
@@ -72,7 +88,6 @@ const AdminBookings = () => {
                   {booking.tourStatus}
                 </Badge>
               </td>
-              <td>${booking.totalPrice}</td>
               <td>
                 <div className="d-flex gap-2">
                   <Button
@@ -84,12 +99,19 @@ const AdminBookings = () => {
                     Complete
                   </Button>
                   <Button
-                    color="danger"
+                    color="warning"
                     size="sm"
                     onClick={() => handleStatusUpdate(booking._id, 'Canceled')}
                     disabled={booking.tourStatus === 'Canceled'}
                   >
                     Cancel
+                  </Button>
+                  <Button
+                    color="danger"
+                    size="sm"
+                    onClick={() => handleDeleteBooking(booking._id)}
+                  >
+                    Delete
                   </Button>
                 </div>
               </td>

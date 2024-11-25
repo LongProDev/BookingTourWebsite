@@ -3,28 +3,26 @@ import path from 'path';
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'public/images');
+    cb(null, path.join(process.cwd(), 'public', 'images'));
   },
   filename: (req, file, cb) => {
-    const originalName = path.parse(file.originalname).name;
-    const extname = path.extname(file.originalname);
-    cb(null, originalName + extname);
+    // Keep original filename
+    cb(null, file.originalname);
   }
 });
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only images are allowed!'), false);
-  }
-};
+const upload = multer({ 
+  storage: storage,
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
 
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb('Error: Images only!');
+    }
   }
 });
 

@@ -5,6 +5,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import { dirname } from 'path';
 
 import tourRoute from "./src/routes/TourRouters.js";
 import userRoute from "./src/routes/UserRouters.js";
@@ -39,7 +41,7 @@ const connect = async () => {
 };
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 
 //middleware
 app.use(express.json());
@@ -50,7 +52,12 @@ app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/bookings", bookingRoute);
 app.use('/api/statistics', statisticsRoute);
-app.use('/images', express.static(path.join(__dirname, '../public/images'))); 
+
+const uploadDir = path.join(process.cwd(), 'public', 'images');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+app.use('/images', express.static(uploadDir));
 
 app.listen(port, () => {
   connect();

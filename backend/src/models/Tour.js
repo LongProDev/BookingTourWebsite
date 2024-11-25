@@ -18,7 +18,6 @@ const tourSchema = new mongoose.Schema({
   time: { type: String, required: true },
   location: { type: String, required: true },
   maxPeople: { type: Number, required: true },
-  date: [{ type: String, required: true }],
   startLocation: { type: String, required: true },
   featured: { type: Boolean, default: false },
   schedules: [scheduleSchema]

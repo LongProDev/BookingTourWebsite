@@ -1,23 +1,44 @@
 import Tour from "../models/Tour.js";
+import path from 'path';
+import fs from 'fs';
+
+const BASE_URL = process.env.BASE_URL || 'http://localhost:4000';
 
 const TourController = {
-  // Get all tours
   getAllTours: async (req, res) => {
     try {
-      const tours = await Tour.find();
+      const page = parseInt(req.query.page) || 0;
+      const limit = parseInt(req.query.limit) || 8;
+      const skip = page * limit;
+
+      const tours = await Tour.find()
+        .skip(skip)
+        .limit(limit);
+
+      const total = await Tour.countDocuments();
+
+      const toursWithFormattedImages = tours.map(tour => ({
+        ...tour._doc,
+        image: tour.image.map(img => 
+          img.startsWith('http') ? img : img.replace(/^\/images\//, '')
+        )
+      }));
+      
       res.status(200).json({
         success: true,
-        data: tours
+        data: toursWithFormattedImages,
+        totalTours: total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit)
       });
     } catch (error) {
-      res.status(500).json({ 
-        success: false, 
-        message: error.message 
+      res.status(500).json({
+        success: false,
+        message: error.message
       });
     }
   },
 
-  // Get tour by ID
   getTourById: async (req, res) => {
     try {
       const tour = await Tour.findById(req.params.id);
@@ -27,74 +48,9 @@ const TourController = {
           message: "Tour not found"
         });
       }
-      res.status(200).json(tour);
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: error.message
-      });
-    }
-  },
-
-  // Create new tour
-  createTour: async (req, res) => {
-    try {
-      const tourData = req.body;
-      
-      // Handle image files
-      if (req.files) {
-        const imageUrls = req.files.map(file => file.filename);
-        tourData.image = imageUrls;
-      }
-
-      const newTour = new Tour(tourData);
-      await newTour.save();
-
-      res.status(201).json({
-        success: true,
-        message: 'Tour created successfully',
-        data: newTour
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: error.message
-      });
-    }
-  },
-
-  // Update tour
-  updateTour: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateData = req.body;
-
-      // Ensure schedules is always an array
-      if (updateData.schedules && !Array.isArray(updateData.schedules)) {
-        updateData.schedules = [];
-      }
-
-      if (req.files && req.files.length > 0) {
-        const imageUrls = req.files.map(file => file.filename);
-        updateData.image = imageUrls;
-      }
-
-      const tour = await Tour.findByIdAndUpdate(
-        id,
-        { $set: updateData },
-        { new: true }
-      );
-
-      if (!tour) {
-        return res.status(404).json({
-          success: false,
-          message: "Tour not found"
-        });
-      }
 
       res.status(200).json({
         success: true,
-        message: "Successfully updated tour",
         data: tour
       });
     } catch (error) {
@@ -105,55 +61,235 @@ const TourController = {
     }
   },
 
-  // Delete tour
-  deleteTour: async (req, res) => {
+  createTour: async (req, res) => {
     try {
-      const tour = await Tour.findByIdAndDelete(req.params.id);
-      if (!tour) {
-        return res.status(404).json({ message: "Tour not found" });
+      console.log('Received tour data:', req.body);
+      console.log('Received files:', req.files);
+
+      // Validate required fields
+      const requiredFields = [
+        'name', 'description', 'price', 'time', 
+        'location', 'maxPeople', 'startLocation'
+      ];
+      
+      const missingFields = requiredFields.filter(field => !req.body[field]);
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Missing required fields: ${missingFields.join(', ')}`
+        });
       }
-      res.status(200).json({ message: "Tour deleted successfully" });
+
+      // Validate images
+      if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: "At least one image is required"
+        });
+      }
+
+      // Prepare tour data with proper type conversion
+      const tourData = {
+        name: req.body.name,
+        description: req.body.description,
+        price: parseFloat(req.body.price) || 0,
+        time: req.body.time,
+        location: req.body.location,
+        maxPeople: parseInt(req.body.maxPeople) || 0,
+        startLocation: req.body.startLocation,
+        featured: req.body.featured === 'true',
+        image: req.files.map(file => file.originalname),
+        schedules: []
+      };
+
+      // Parse schedules if provided
+      if (req.body.schedules) {
+        try {
+          const schedulesData = JSON.parse(req.body.schedules);
+          tourData.schedules = schedulesData.map(schedule => ({
+            departureDate: new Date(schedule.departureDate),
+            departureTime: schedule.departureTime,
+            returnDate: new Date(schedule.returnDate),
+            returnTime: schedule.returnTime,
+            transportation: schedule.transportation,
+            availableSeats: parseInt(schedule.availableSeats),
+            price: parseFloat(schedule.price)
+          }));
+        } catch (e) {
+          console.error('Error parsing schedules:', e);
+          tourData.schedules = [];
+        }
+      }
+
+      console.log('Processed tour data:', tourData);
+
+      const newTour = new Tour(tourData);
+      const savedTour = await newTour.save();
+
+      res.status(201).json({
+        success: true,
+        message: "Tour created successfully",
+        data: savedTour
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Tour creation error:', error);
+      // Clean up uploaded files on error
+      if (req.files) {
+        req.files.forEach(file => {
+          const filePath = path.join(process.cwd(), 'public', 'images', file.filename);
+          fs.unlink(filePath, err => {
+            if (err) console.error('Error deleting file:', err);
+          });
+        });
+      }
+      res.status(400).json({
+        success: false,
+        message: error.message || 'Error creating tour'
+      });
     }
   },
 
-  // Get featured tours
+  updateTour: async (req, res) => {
+    try {
+      const updateData = { ...req.body };
+      
+      // Handle numeric fields
+      if (updateData.price) updateData.price = parseFloat(updateData.price);
+      if (updateData.maxPeople) updateData.maxPeople = parseInt(updateData.maxPeople);
+      if (updateData.featured) updateData.featured = updateData.featured === 'true';
+
+      // Handle schedules
+      if (updateData.schedules) {
+        try {
+          const schedulesData = JSON.parse(updateData.schedules);
+          updateData.schedules = schedulesData.map(schedule => ({
+            departureDate: new Date(schedule.departureDate),
+            departureTime: schedule.departureTime,
+            returnDate: new Date(schedule.returnDate),
+            returnTime: schedule.returnTime,
+            transportation: schedule.transportation,
+            availableSeats: parseInt(schedule.availableSeats),
+            price: parseFloat(schedule.price)
+          }));
+        } catch (e) {
+          console.error('Error parsing schedules:', e);
+          updateData.schedules = [];
+        }
+      }
+
+      // Handle new images if uploaded
+      if (req.files && req.files.length > 0) {
+        updateData.image = req.files.map(file => file.originalname);
+      }
+
+      console.log('Schedules before update:', updateData.schedules);
+      const tour = await Tour.findByIdAndUpdate(
+        req.params.id,
+        { $set: updateData },
+        { 
+          new: true,
+          runValidators: true
+        }
+      ).catch(error => {
+        console.error('MongoDB Update Error:', {
+          name: error.name,
+          message: error.message,
+          errors: error.errors
+        });
+        throw error;
+      });
+
+      if (!tour) {
+        return res.status(404).json({
+          success: false,
+          message: "Tour not found"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Tour updated successfully",
+        data: tour
+      });
+    } catch (error) {
+      console.error('Tour update error details:', {
+        name: error.name,
+        message: error.message,
+        errors: error.errors
+      });
+      res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  deleteTour: async (req, res) => {
+    try {
+      const tour = await Tour.findById(req.params.id);
+      if (!tour) {
+        return res.status(404).json({
+          success: false,
+          message: "Tour not found"
+        });
+      }
+
+      // Delete associated images
+      if (tour.image && tour.image.length > 0) {
+        tour.image.forEach(filename => {
+          const filePath = path.join(process.cwd(), 'public', 'images', filename);
+          fs.unlink(filePath, err => {
+            if (err) console.error('Error deleting file:', err);
+          });
+        });
+      }
+
+      await Tour.findByIdAndDelete(req.params.id);
+      res.status(200).json({
+        success: true,
+        message: "Tour deleted successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getFeaturedTours: async (req, res) => {
     try {
       const featuredTours = await Tour.find({ featured: true });
       res.status(200).json({
         success: true,
-        message: "Successfully fetched featured tours",
         data: featuredTours
       });
     } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
   },
 
-  // Get tour by search
   getTourBySearch: async (req, res) => {
-    const { location, startLocation, price } = req.query;
-    
     try {
+      const { location, startLocation, price } = req.query;
       const query = {};
-      
+
       if (location) query.location = { $regex: location, $options: 'i' };
       if (startLocation) query.startLocation = { $regex: startLocation, $options: 'i' };
-      if (price) query.price = { $lte: parseInt(price) };
+      if (price) query.price = { $lte: parseFloat(price) };
 
       const tours = await Tour.find(query);
-      
       res.status(200).json({
         success: true,
-        message: "Successfully found tours",
         data: tours
       });
     } catch (error) {
-      res.status(404).json({
+      res.status(400).json({
         success: false,
-        message: "Not found"
+        message: error.message
       });
     }
   },
@@ -163,7 +299,6 @@ const TourController = {
       const tours = await Tour.find();
       res.status(200).json({
         success: true,
-        message: "Successfully fetched all tours",
         data: tours
       });
     } catch (error) {
@@ -177,34 +312,41 @@ const TourController = {
   updateScheduleSeats: async (req, res) => {
     try {
       const { tourId, scheduleId } = req.params;
-      const { bookedSeats } = req.body;
+      const { seatsToBook } = req.body;
 
       const tour = await Tour.findById(tourId);
       if (!tour) {
-        return res.status(404).json({ success: false, message: 'Tour not found' });
+        return res.status(404).json({
+          success: false,
+          message: "Tour not found"
+        });
       }
 
       const schedule = tour.schedules.id(scheduleId);
       if (!schedule) {
-        return res.status(404).json({ success: false, message: 'Schedule not found' });
-      }
-
-      schedule.availableSeats -= bookedSeats;
-      
-      if (schedule.availableSeats < 0) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Not enough available seats' 
+        return res.status(404).json({
+          success: false,
+          message: "Schedule not found"
         });
       }
 
+      if (schedule.availableSeats < seatsToBook) {
+        return res.status(400).json({
+          success: false,
+          message: "Not enough seats available"
+        });
+      }
+
+      schedule.availableSeats -= seatsToBook;
       await tour.save();
-      
+
       res.status(200).json({
         success: true,
-        data: schedule
+        message: "Seats updated successfully",
+        availableSeats: schedule.availableSeats
       });
     } catch (error) {
+      console.error('Seat update error:', error);
       res.status(500).json({
         success: false,
         message: error.message

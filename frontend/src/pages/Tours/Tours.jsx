@@ -1,28 +1,41 @@
 import React, { useEffect, useState } from "react";
 import CommonSection from "../../shared/CommonSection";
-
 import "./tours.css";
 import TourCard from "../../shared/TourCard";
 import SearchBar from "../../shared/SearchBar";
 import Newsletter from "../../shared/Newsletter";
-
 import { Container, Row, Col } from "reactstrap";
-
-import useFetch from "../../hooks/useFetch";
-import { BASE_URL } from "../../utils/config";
+import tourService from "../../services/tourService";
 
 const Tours = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
-
-  const { data: tours, loading, error } = useFetch(`${BASE_URL}/tours?page=${page}`);
-  const { data: tourCount } = useFetch(`${BASE_URL}/tours/search/getTourCount`);
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const TOURS_PER_PAGE = 8;
 
   useEffect(() => {
-    const pages = Math.ceil(tourCount / 8); 
-    setPageCount(pages);
-    window.scrollTo(0, 0)
-  }, [page, tourCount, tours]);
+    const fetchTours = async () => {
+      try {
+        setLoading(true);
+        const response = await tourService.getAllTours(page, TOURS_PER_PAGE);
+        if (response.success) {
+          setTours(response.data);
+          // Calculate total pages
+          const total = response.totalTours || 0;
+          setPageCount(Math.ceil(total / TOURS_PER_PAGE));
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTours();
+    window.scrollTo(0, 0);
+  }, [page]);
 
   return (
     <>

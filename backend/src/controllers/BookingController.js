@@ -1,4 +1,5 @@
 import Booking from "../models/Booking.js";
+import Tour from "../models/Tour.js";
 
 const bookingController = {
   // Get all bookings
@@ -47,18 +48,57 @@ const bookingController = {
   // Create new booking
   createBooking: async (req, res) => {
     try {
+      const { seatsToUpdate, ...bookingData } = req.body;
+      
+      // Find tour and validate seats
+      const tour = await Tour.findById(bookingData.tourId);
+      if (!tour) {
+        return res.status(404).json({
+          success: false,
+          message: "Tour not found"
+        });
+      }
+
+      const schedule = tour.schedules.id(bookingData.scheduleId);
+      if (!schedule) {
+        return res.status(404).json({
+          success: false,
+          message: "Schedule not found"
+        });
+      }
+
+      if (schedule.availableSeats < seatsToUpdate) {
+        return res.status(400).json({
+          success: false,
+          message: "Not enough seats available"
+        });
+      }
+
+      // Update seats
+      schedule.availableSeats -= seatsToUpdate;
+      await tour.save();
+
+      // Create booking
       const booking = new Booking({
-        ...req.body,
-        bookingDate: new Date()
+        ...bookingData,
+        bookingDate: new Date(),
+        tourStatus: 'Paid'
       });
       
       const newBooking = await booking.save();
       const populatedBooking = await Booking.findById(newBooking._id)
         .populate("customerId", "-password");
       
-      res.status(201).json(populatedBooking);
+      res.status(201).json({
+        success: true,
+        data: populatedBooking
+      });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      console.error('Booking creation error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
     }
   },
 

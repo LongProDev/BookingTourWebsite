@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardBody } from "reactstrap";
 import { Link } from "react-router-dom";
-
 import "./tour-card.css";
 
 const TourCard = ({ tour }) => {
@@ -17,22 +16,27 @@ const TourCard = ({ tour }) => {
     featured,
   } = tour;
 
+  const [imgSrc, setImgSrc] = useState(() => {
+    if (!image || !image[0]) return '/images/placeholder.jpg';
+    return image[0].startsWith('http') 
+      ? image[0] 
+      : `${process.env.REACT_APP_API_URL}/images/${image[0]}`;
+  });
+
+  const handleImageError = () => {
+    console.error('Image failed to load:', imgSrc);
+    setImgSrc('/images/placeholder.jpg');
+  };
+
   return (
     <div className="tour__card">
       <Card>
         <div className="tour__img">
-          
-            <img
-              src={`${process.env.REACT_APP_API_URL}/images/${image[0]}`}
-              alt={name}
-              onError={(e) => {
-                console.error('Image failed to load:', image[0]);
-                e.target.src = '/placeholder.jpg';
-              }}
-            />
-          ) : (
-            <img src="/placeholder.jpg" alt="Tour placeholder" />
-          )
+          <img
+            src={imgSrc}
+            alt={name}
+            onError={handleImageError}
+          />
           {featured && <span>Featured</span>}
         </div>
       </Card>

@@ -4,7 +4,7 @@ const bookingSchema = new mongoose.Schema({
   customerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
   },
   customerName: { type: String, required: true },
   customerEmail: { type: String, required: true },
@@ -33,6 +33,11 @@ const bookingSchema = new mongoose.Schema({
   bookingDate: { type: Date, required: true },
   discountCode: { type: String },
   totalPrice: { type: Number, required: true },
+  tourId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Tour",
+    required: true,
+  },
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);

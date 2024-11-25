@@ -4,6 +4,7 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import { AuthContext } from "../../context/AuthContext";
 import "./header.css";
+import ToursDropdown from './ToursDropdown';
 
 
 const nav__links = [
@@ -79,6 +80,7 @@ const Header = () => {
                     <NavLink to={item.path} onClick={toggleMenu}>
                       {item.display}
                     </NavLink>
+                    {item.path === "/tours" && <ToursDropdown />}
                   </li>
                 ))}
               </ul>

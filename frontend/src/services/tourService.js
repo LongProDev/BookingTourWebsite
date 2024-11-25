@@ -1,8 +1,8 @@
 import api from './api';
 
 const tourService = {
-  getAllTours: async () => {
-    const response = await api.get('/tours');
+  getAllTours: async (page = 0, limit = 8) => {
+    const response = await api.get(`/tours?page=${page}&limit=${limit}`);
     return response.data;
   },
 
@@ -14,10 +14,7 @@ const tourService = {
   getTourById: async (id) => {
     try {
       const response = await api.get(`/tours/${id}`);
-      return {
-        success: true,
-        data: response.data
-      };
+      return response.data;
     } catch (error) {
       console.error('Error fetching tour:', error);
       throw error;
@@ -25,8 +22,16 @@ const tourService = {
   },
 
   createTour: async (tourData) => {
-    const response = await api.post('/tours', tourData);
-    return response.data;
+    try {
+      const response = await api.post('/tours', tourData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
   updateTour: async (id, tourData) => {

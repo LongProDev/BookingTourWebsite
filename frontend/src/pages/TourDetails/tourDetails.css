@@ -58,24 +58,70 @@
 }
 
 .tour-images .carousel {
+  background: #f8f9fa;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tour-images .carousel-item {
+  height: 400px;
 }
 
 .tour-images .carousel-item img {
   width: 100%;
-  height: 500px;
+  height: 100%;
   object-fit: cover;
 }
 
 .carousel-control-prev,
 .carousel-control-next {
-  background: rgba(0,0,0,0.3);
+  background: rgba(0, 0, 0, 0.3);
   width: 40px;
   height: 40px;
   border-radius: 50%;
   top: 50%;
   transform: translateY(-50%);
-  margin: 0 20px;
-} 
+  margin: 0 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.carousel-indicators {
+  margin-bottom: 0.5rem;
+}
+
+.carousel-indicators button {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 0 5px;
+}
+
+.tour-images .carousel:hover .carousel-control-prev,
+.tour-images .carousel:hover .carousel-control-next {
+  opacity: 1;
+}
+
+.schedule-item {
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-item span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.schedule-item i {
+  color: #faa935;
+  margin-right: 5px;
+}
+
+.schedules-list {
+  margin-top: 15px;
+}
+ 
