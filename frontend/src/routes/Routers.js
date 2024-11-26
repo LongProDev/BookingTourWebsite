@@ -19,6 +19,7 @@ import ProtectedRoute from "../routes/ProtectedRoute.jsx";
 import PaymentConfirmation from '../pages/Payment/PaymentConfirmation';
 import PaymentGateway from "../pages/Payment/PaymentGateway.jsx";
 import PaymentSuccess from "../pages/Payment/PaymentSuccess.jsx";
+import BookingSuccess from "../pages/Booking/BookingSuccess.jsx";
 
 
 const Routers = () => {
@@ -45,6 +46,7 @@ const Routers = () => {
       <Route path="/payment-confirmation" element={<PaymentConfirmation />} />
       <Route path="/payment-gateway" element={<PaymentGateway />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/booking-success" element={<BookingSuccess />} />
     </Routes>
   );
 };

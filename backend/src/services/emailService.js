@@ -60,3 +60,47 @@ export const sendBookingConfirmationEmail = async (booking) => {
     throw error;
   }
 };
+
+export const sendPayLaterEmail = async (booking) => {
+  try {
+    const mailOptions = {
+      from: '"Tour Booking" <thanhlongn08@gmail.com>',
+      to: booking.customerEmail,
+      subject: "Tour Booking Payment Reminder",
+      html: `
+        <h1>Tour Booking Payment Reminder</h1>
+        <p>Dear ${booking.customerName},</p>
+        <p>Thank you for booking with us! Your booking is currently pending payment.</p>
+        <h2>Booking Details:</h2>
+        <ul>
+          <li>Tour: ${booking.tourName}</li>
+          <li>Departure Date: ${new Date(
+            booking.departureDate
+          ).toLocaleDateString()}</li>
+          <li>Departure Time: ${booking.departureTime}</li>
+          <li>Return Date: ${new Date(
+            booking.returnDate
+          ).toLocaleDateString()}</li>
+          <li>Return Time: ${booking.returnTime}</li>
+          <li>Transportation: ${booking.transportation}</li>
+          <li>Adults: ${booking.numberOfAdults}</li>
+          <li>Children: ${booking.numberOfChildren}</li>
+          <li>Total Amount Due: $${booking.totalPrice}</li>
+        </ul>
+        <p>To secure your booking, please contact us to arrange payment:</p>
+        <ul>
+          <li>Email: thanhlongn08@gmail.com</li>
+          <li>Phone: 0966441683</li>
+        </ul>
+        <p>Please note that your booking is not confirmed until payment is received.</p>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Pay later email sent successfully:", info.messageId);
+    return info;
+  } catch (error) {
+    console.error("Email sending error:", error);
+    throw error;
+  }
+};
