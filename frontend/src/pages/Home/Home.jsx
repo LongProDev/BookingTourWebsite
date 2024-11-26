@@ -1,5 +1,5 @@
 import React from "react";
-import "./home.css";                                                                                
+import "./home.css";
 
 import { Container, Row, Col } from "reactstrap";
 import heroImg from "../../assets/images/hero-img01.jpg";
@@ -9,7 +9,6 @@ import worldImg from "../../assets/images/world.png";
 import experienceImg from "../../assets/images/experience.png";
 
 import Subtitle from "../../shared/Subtitle";
-import ServiceList from "../../shared/ServiceList.jsx";
 import SearchBar from "../../shared/SearchBar";
 
 import FeaturedTourList from "../../components/Featured-tours/FeaturedTourList";
@@ -26,7 +25,7 @@ const Home = () => {
             <Col lg="6">
               <div className="hero__content">
                 <div className="hero__subtitle d-flex align-items-center">
-                  <Subtitle subtitle={"Know Before You Go"} />  
+                  <Subtitle subtitle={"Know Before You Go"} />
                   <img src={worldImg} alt="" />
                 </div>
                 <h1>
@@ -62,18 +61,6 @@ const Home = () => {
       <section>
         <Container>
           <Row>
-            <Col lg="3">
-              <h5 className="services__subtitle"> What we serve</h5>
-              <h2 className="services_title">We offer our best services</h2>
-            </Col>
-            <ServiceList />
-          </Row>
-        </Container>
-      </section>
-
-      <section>
-        <Container>
-          <Row>
             <Col lg="12" className="mb-5">
               <Subtitle subtitle={"Explore"} />
               <h2 className="featured__tour-title">Our featured tours</h2>
@@ -92,7 +79,23 @@ const Home = () => {
                 <h2>
                   With our all experience <br /> we will serve you
                 </h2>
-                <p>Không đi thì phí quá</p>
+                <p>
+                  With 10 years of experience in organizing and distributing
+                  affordable, high-quality tours packed with the most exciting
+                  experiences, TravelEasy has brought millions of travelers the
+                  most worthwhile journeys. By quickly capturing travel trends,
+                  TravelEasy is always at the forefront of offering attractive
+                  itineraries and fresh destinations for the community of travel
+                  enthusiasts. <br /> In addition, TravelEasy is an agent for over 200
+                  domestic and international airlines and has an extensive
+                  network of hotel partners while also providing visa services
+                  to more than 100 countries. Whether it's a domestic or
+                  international tour, TravelEasy ensures top-quality services at
+                  the most affordable prices. All travelers need to do are three
+                  simple steps: choose a tour, book it, and make
+                  payment—TravelEasy will handle the rest. Just pack your bags,
+                  wait for your travel date, and enjoy your journey!
+                </p>
               </div>
               <div className="counter__wrapper d-flex align-items-center gap-5">
                 <div className="counter__box">
@@ -104,7 +107,7 @@ const Home = () => {
                   <h6>Regular clients</h6>
                 </div>
                 <div className="counter__box">
-                  <span>12k+</span>
+                  <span>10+</span>
                   <h6>Years experience </h6>
                 </div>
               </div>

@@ -13,9 +13,9 @@ const gallertyImages =[
     galleryImg03, 
     galleryImg04, 
     galleryImg07, 
-    galleryImg02, 
+    galleryImg01, 
     galleryImg08,
-    galleryImg01
+    galleryImg02
 ]
 
 export default gallertyImages

@@ -22,16 +22,20 @@ const quick__links = [
 ];
 const quick__links2 = [
   {
-    path: "/gallery",
-    display: "Gallery",
+    path: "/recruitment",
+    display: "Recruitment",
   },
   {
-    path: "/login",
-    display: "Login",
+    path: "/payment-instructions",
+    display: "Payment instructions",
   },
   {
     path: "/register",
-    display: "Register",
+    display: "Sign up to receive the newsletter",
+  },
+  {
+    path: "/register",
+    display: "Register partners",
   },
 ];
 
@@ -45,7 +49,7 @@ const Footer = () => {
           <Col lg="3">
             <div className="logo">
               <img src={logo} alt="" />
-              <p>Không book ngay thì phí quá.</p>
+              <p>Bringing the whole world to your fingertips!</p>
 
               <div className="social__links d-flex align-items-center gap-4">
                 <span>
@@ -70,26 +74,6 @@ const Footer = () => {
                 </span>
               </div>
             </div>
-          </Col>
-          <Col lg="3">
-            <h5 className="footer__link-title">Discovery</h5>
-            <ListGroup className="footer__quick-links">
-              {quick__links.map((item, index) => (
-                <ListGroupItem key={index} className="ps-0 border-0">
-                  <Link to={item.path}>{item.display}</Link>
-                </ListGroupItem>
-              ))}
-            </ListGroup>
-          </Col>
-          <Col lg="3">
-            <h5 className="footer__link-title">Quick Links</h5>
-            <ListGroup className="footer__quick-links">
-              {quick__links2.map((item, index) => (
-                <ListGroupItem key={index} className="ps-0 border-0">
-                  <Link to={item.path}>{item.display}</Link>
-                </ListGroupItem>
-              ))}
-            </ListGroup>
           </Col>
           <Col lg="3">
             <h5 className="footer__link-title">Contact</h5>
@@ -125,6 +109,27 @@ const Footer = () => {
               </ListGroupItem>
             </ListGroup>
           </Col>
+          <Col lg="3">
+            <h5 className="footer__link-title">Discovery</h5>
+            <ListGroup className="footer__quick-links">
+              {quick__links.map((item, index) => (
+                <ListGroupItem key={index} className="ps-0 border-0">
+                  <Link to={item.path}>{item.display}</Link>
+                </ListGroupItem>
+              ))}
+            </ListGroup>
+          </Col>
+          <Col lg="3">
+            <h5 className="footer__link-title">Other</h5>
+            <ListGroup className="footer__quick-links">
+              {quick__links2.map((item, index) => (
+                <ListGroupItem key={index} className="ps-0 border-0">
+                  <Link to={item.path}>{item.display}</Link>
+                </ListGroupItem>
+              ))}
+            </ListGroup>
+          </Col>
+          
           <Col lg="12" className="text-center pt-5">
             <p className="copyright">
               Copyright {year}, design and develop by LongProDev. All rights
