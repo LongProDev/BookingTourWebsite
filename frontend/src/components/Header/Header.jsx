@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useContext, useState } from "react";
 import { Container, Row, Button } from "reactstrap";
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link} from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import { AuthContext } from "../../context/AuthContext";
 import "./header.css";
@@ -10,7 +10,6 @@ import UserDropdown from './UserDropdown';
 const Header = () => {
   const headerRef = useRef(null);
   const menuRef = useRef(null);
-  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [menuOpen, setMenuOpen] = useState(false);
 

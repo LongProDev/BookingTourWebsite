@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.js";
 import Tour from "../models/Tour.js";
+import { sendBookingConfirmationEmail } from '../services/emailService.js';
 
 const bookingController = {
   // Get all bookings
@@ -48,7 +49,7 @@ const bookingController = {
   // Create new booking
   createBooking: async (req, res) => {
     try {
-      const { seatsToUpdate, ...bookingData } = req.body;
+      const { seatsToUpdate, isGuestBooking, guestInfo, ...bookingData } = req.body;
       
       // Find tour and validate seats
       const tour = await Tour.findById(bookingData.tourId);
@@ -77,17 +78,22 @@ const bookingController = {
         });
       }
 
-      // Create booking with validated status values
+      // Create booking with guest or user information
       const booking = new Booking({
         ...bookingData,
         bookingDate: new Date(),
         tourStatus: 'Pending',
-        paymentStatus: 'Pending'
+        paymentStatus: 'Pending',
+        isGuestBooking: true,
+        customerName: bookingData.customerName,
+        customerEmail: bookingData.customerEmail,
+        customerPhone: bookingData.customerPhone,
+        customerId: req.user?._id || null
       });
       
       const newBooking = await booking.save();
 
-      // Update seats after successful booking creation
+      // Update seats
       schedule.availableSeats -= totalSeats;
       await tour.save();
       
@@ -199,24 +205,30 @@ const bookingController = {
       const { paymentStatus } = req.body;
       const bookingId = req.params.id;
 
-      if (!['Pending', 'Processing', 'Completed', 'Failed'].includes(paymentStatus)) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid payment status"
-        });
-      }
-
       const booking = await Booking.findByIdAndUpdate(
         bookingId,
-        { paymentStatus },
+        { 
+          paymentStatus,
+          tourStatus: paymentStatus === 'Completed' ? 'Paid' : 'Pending'
+        },
         { new: true }
-      );
-      
+      ).populate('tourId');
+
       if (!booking) {
         return res.status(404).json({
           success: false,
           message: "Booking not found"
         });
+      }
+
+      // Send confirmation email only if payment is completed
+      if (paymentStatus === 'Completed') {
+        try {
+          await sendBookingConfirmationEmail(booking);
+        } catch (emailError) {
+          console.error('Email sending failed:', emailError);
+          // Continue with the response even if email fails
+        }
       }
 
       res.status(200).json({
@@ -228,6 +240,32 @@ const bookingController = {
       res.status(500).json({
         success: false,
         message: error.message || 'Failed to update payment status'
+      });
+    }
+  },
+
+  // Get booking payment status
+  getBookingPaymentStatus: async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const booking = await Booking.findById(id);
+      if (!booking) {
+        return res.status(404).json({
+          success: false,
+          message: 'Booking not found'
+        });
+      }
+
+      return res.json({
+        success: true,
+        paymentStatus: booking.paymentStatus
+      });
+    } catch (error) {
+      console.error('Error getting booking payment status:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to get booking payment status'
       });
     }
   }

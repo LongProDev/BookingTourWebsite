@@ -20,7 +20,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 4000;
 const corsOptions = {
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -53,6 +53,14 @@ app.use("/api/auth", authRoute);
 app.use("/api/bookings", bookingRoute);
 app.use('/api/statistics', statisticsRoute);
 app.use('/api/payments', paymentRoute);
+
+const requiredEnvVars = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'CLIENT_URL'];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  process.exit(1);
+}
 
 const uploadDir = path.join(process.cwd(), 'public', 'images');
 if (!fs.existsSync(uploadDir)) {

@@ -82,8 +82,8 @@ const AdminBookings = () => {
               <td>${booking.totalPrice}</td>
               <td>
                 <Badge color={
-                  booking.tourStatus === 'Paid' ? 'warning' :
-                  booking.tourStatus === 'Completed' ? 'success' : 'danger'
+                  booking.tourStatus === 'Paid' ? 'primary' :
+                  booking.tourStatus === 'Completed' ? 'success' : 'warning'
                 }>
                   {booking.tourStatus}
                 </Badge>

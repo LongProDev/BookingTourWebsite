@@ -20,9 +20,7 @@ const authService = {
       return response.data;
     } catch (error) {
       console.error('Login error:', error.response?.data || error);
-      throw {
-        message: error.response?.data?.message || 'Login failed. Please try again.'
-      };
+      throw new Error('Invalid credentials');
     }
   },
 

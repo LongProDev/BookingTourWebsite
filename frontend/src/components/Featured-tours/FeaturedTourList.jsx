@@ -1,6 +1,5 @@
 import React, { useState, useRef } from "react";
 import TourCard from "../../shared/TourCard";
-import { Col } from "reactstrap";
 import useFetch from "../../hooks/useFetch";
 import { BASE_URL } from "../../utils/config.js";
 import "./featuredTourList.css";

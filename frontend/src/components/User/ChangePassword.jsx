@@ -1,11 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Container, Row, Col, Form, FormGroup, Button } from 'reactstrap';
-import { AuthContext } from '../../context/AuthContext';
 import userIcon from "../../assets/images/user.png";
 import authService from '../../services/authService';
 
 const ChangePassword = () => {
-  const { user } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',

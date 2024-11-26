@@ -1,4 +1,7 @@
 import api from './api';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const bookingService = {
   getAllBookings: async () => {
@@ -18,15 +21,10 @@ const bookingService = {
 
   createBooking: async (bookingData) => {
     try {
-      // Send all data in a single request
-      const response = await api.post('/bookings', {
-        ...bookingData,
-        seatsToUpdate: bookingData.numberOfAdults + bookingData.numberOfChildren
-      });
+      const response = await api.post('/bookings', bookingData);
       return response.data;
     } catch (error) {
-      console.error('Booking creation error:', error);
-      throw error;
+      throw error.response?.data || error;
     }
   },
 
@@ -39,6 +37,30 @@ const bookingService = {
     const response = await api.delete(`/bookings/${id}`);
     return response.data;
   },
+
+  updateBookingPayment: async (bookingId, paymentStatus) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/bookings/${bookingId}/payment`,
+        { paymentStatus },
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message);
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Payment update error:', error);
+      throw error.response?.data || error;
+    }
+  }
 };
 
 export default bookingService; 

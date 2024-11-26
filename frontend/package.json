@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@paypal/react-paypal-js": "^8.7.0",
+    "@stripe/react-stripe-js": "^3.0.0",
+    "@stripe/stripe-js": "^5.2.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -20,6 +21,8 @@
     "react-cookie": "^7.2.2",
     "react-datetime-picker": "^6.0.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^5.3.0",
     "react-quill": "^2.0.0",
     "react-responsive-masonry": "^2.4.1",
     "react-router-dom": "^6.28.0",

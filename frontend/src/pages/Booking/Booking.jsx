@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Container, Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap';
+import { Container, Row, Col ,FormGroup, Label, Input, Button } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import './booking.css';
 import tourService from '../../services/tourService';
 import bookingService from '../../services/bookingService';
-import discountService from '../../services/discountService';
+import PaymentGateway from '../../pages/Payment/PaymentGateway';
+import { toast } from 'react-hot-toast';
 
 const Booking = () => {
   const { id } = useParams();
@@ -27,6 +28,7 @@ const Booking = () => {
     discount: 0,
     totalPrice: 0
   });
+  const [bookingData] = useState(null);
 
   // Fetch tour data
   useEffect(() => {
@@ -103,82 +105,38 @@ const Booking = () => {
     e.preventDefault();
     
     try {
-      // Basic validation
-      if (!selectedSchedule) {
-        alert('Please select a departure schedule');
-        return;
-      }
-
-      if (!formData.paymentMethod) {
-        alert('Please select a payment method');
-        return;
-      }
-
-      if (!formData.agreedToPolicy) {
-        alert('Please agree to the booking policy');
-        return;
-      }
-
-      // Validate contact information
-      if (!formData.customerName || !formData.customerEmail || !formData.customerPhone) {
-        alert('Please fill in all contact information');
-        return;
-      }
-
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.customerEmail)) {
-        alert('Please enter a valid email address');
-        return;
-      }
-
-      const adults = parseInt(formData.numberOfAdults);
-      const children = parseInt(formData.numberOfChildren);
-      const totalPassengers = adults + children;
-
-      if (totalPassengers <= 0) {
-        alert('Please select at least one passenger');
-        return;
-      }
-
-      if (totalPassengers > selectedSchedule.availableSeats) {
-        alert(`Only ${selectedSchedule.availableSeats} seats available`);
-        return;
-      }
-
+      const totalSeats = formData.numberOfAdults + formData.numberOfChildren;
       const bookingData = {
-        customerName: formData.customerName.trim(),
-        customerEmail: formData.customerEmail.trim(),
-        customerPhone: formData.customerPhone.trim(),
-        numberOfAdults: adults,
-        numberOfChildren: children,
-        notes: formData.notes.trim(),
-        paymentMethod: formData.paymentMethod,
-        agreedToPolicy: true,
-        tourId: tour._id,
+        ...formData,
+        tourId: id,
         tourName: tour.name,
         scheduleId: selectedSchedule._id,
-        departureDate: new Date(selectedSchedule.departureDate).toISOString(),
+        scheduleDate: selectedSchedule.departureDate,
+        departureDate: selectedSchedule.departureDate,
         departureTime: selectedSchedule.departureTime,
-        returnDate: new Date(selectedSchedule.returnDate).toISOString(),
+        returnDate: selectedSchedule.returnDate,
         returnTime: selectedSchedule.returnTime,
         transportation: selectedSchedule.transportation,
-        discountCode: formData.discountCode.trim() || null,
-        subtotal: Number(formData.subtotal),
-        discount: Number(formData.discount),
-        totalPrice: Number(formData.totalPrice)
+        location: tour.location,
+        seatsToUpdate: totalSeats,
+        tourStatus: 'Pending',
+        paymentStatus: 'Pending',
       };
 
       const response = await bookingService.createBooking(bookingData);
       
       if (response.success) {
-        navigate('/booking/success');
+        navigate('/payment-confirmation', { 
+          state: { 
+            bookingData: { ...response.data, ...bookingData } 
+          } 
+        });
       } else {
         throw new Error(response.message || 'Booking failed');
       }
     } catch (error) {
-      console.error('Booking error details:', error);
-      alert('Failed to create booking. Please try again.');
+      console.error('Booking error:', error);
+      toast.error(error.message || 'Failed to create booking');
     }
   };
 
@@ -298,11 +256,11 @@ const Booking = () => {
                       <Input
                         type="radio"
                         name="paymentMethod"
-                        value="PayPal"
-                        checked={formData.paymentMethod === 'PayPal'}
+                        value="Stripe"
+                        checked={formData.paymentMethod === 'Stripe'}
                         onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
                         required
-                      /> PayPal
+                      /> Stripe
                     </Label>
                   </FormGroup>
                   <FormGroup check>
@@ -391,6 +349,11 @@ const Booking = () => {
           </Col>
         </Row>
       </Container>
+      {bookingData && (
+        <PaymentGateway 
+          bookingData={bookingData}
+        />
+      )}
     </section>
   );
 };
