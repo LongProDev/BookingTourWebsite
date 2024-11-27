@@ -147,9 +147,6 @@ const TourDetails = () => {
                   <span>
                     <i className="ri-map-pin-line"></i> {tour.startLocation}
                   </span>
-                  <span>
-                    <i className="ri-group-line"></i> {tour.maxPeople} people
-                  </span>
                 </div>
                 <h5>Description</h5>
                 <div dangerouslySetInnerHTML={{ __html: tour.description }} />

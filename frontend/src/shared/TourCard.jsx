@@ -9,7 +9,6 @@ const TourCard = ({ tour }) => {
     name,
     image,
     time,
-    maxPeople,
     startLocation,
     location,
     price,
@@ -65,9 +64,6 @@ const TourCard = ({ tour }) => {
             ${price} <span>/per person</span>
           </h5>
           <div className="tour__info d-flex align-items-center gap-3">
-            <span className="d-flex align-items-center gap-1">
-              <i className="ri-user-line"></i> {maxPeople}
-            </span>
             <button className="btn booking__btn">
               <Link to={`/tours/${_id}/booking`}>Book Now</Link>
             </button>
