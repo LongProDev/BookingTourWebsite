@@ -1,52 +1,103 @@
 .admin-bookings {
-  padding: 2rem;
-  background-color: #f8f9fa;
+  max-width: 100%;
+  padding: 20px;
+  font-size: 14px;
 }
 
-.admin-bookings h2 {
-  color: var(--heading-color);
-  margin-bottom: 2rem;
+.admin-bookings table {
+  width: 100%;
+  table-layout: fixed;
 }
 
-.admin-bookings .table {
-  background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  border-radius: 8px;
-}
-
-.admin-bookings .table th {
-  background-color: #f1f1f1;
-  color: #333;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.admin-bookings .badge {
-  padding: 8px 12px;
-  font-size: 0.85rem;
-}
-
-.admin-bookings .btn-group {
-  gap: 0.5rem;
-}
-
+.admin-bookings th, 
 .admin-bookings td {
+  padding: 8px;
   vertical-align: middle;
-  font-size: 0.9rem;
+  word-wrap: break-word;
 }
 
-.admin-bookings .btn {
-  white-space: nowrap;
-  margin: 2px;
+/* Column width distributions */
+.admin-bookings th:nth-child(1), /* Customer Name */
+.admin-bookings td:nth-child(1) {
+  width: 12%;
 }
 
+.admin-bookings th:nth-child(2), /* Email */
+.admin-bookings td:nth-child(2) {
+  width: 15%;
+}
+
+.admin-bookings th:nth-child(3), /* Phone */
+.admin-bookings td:nth-child(3) {
+  width: 10%;
+}
+
+.admin-bookings th:nth-child(4), /* Tour Name */
+.admin-bookings td:nth-child(4) {
+  width: 12%;
+}
+
+.admin-bookings th:nth-child(5), /* Passengers */
+.admin-bookings td:nth-child(5) {
+  width: 10%;
+}
+
+.admin-bookings th:nth-child(6), /* Booking Time */
+.admin-bookings td:nth-child(6) {
+  width: 15%;
+}
+
+.admin-bookings th:nth-child(7), /* Total Price */
+.admin-bookings td:nth-child(7) {
+  width: 8%;
+}
+
+.admin-bookings th:nth-child(8), /* Status */
+.admin-bookings td:nth-child(8) {
+  width: 8%;
+}
+
+.admin-bookings th:nth-child(9), /* Actions */
 .admin-bookings td:nth-child(9) {
-  min-width: 200px;
+  width: 10%;
 }
 
-.admin-bookings .table td {
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* Action buttons container */
+.booking-actions {
+  display: grid; 
+  grid-template-rows: auto; 
+  row-gap: 5px; 
+  justify-items: center; 
+  
+}
+
+/* Make buttons more compact */
+.booking-actions .btn {
+  padding: 4px 8px;
+  font-size: 0.875rem;
+  flex-direction: column;
+  justify-content: flex-start;
 } 
+
+/* Add these to your existing CSS */
+.search-filters {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.search-filters .form-group {
+  margin-bottom: 0;
+}
+
+.search-filters label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.search-filters input,
+.search-filters select {
+  font-size: 14px;
+}
+  

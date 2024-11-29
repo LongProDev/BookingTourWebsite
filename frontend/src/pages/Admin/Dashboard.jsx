@@ -1,6 +1,6 @@
 import React from 'react';
-import { Tabs } from 'antd';
-import { useNavigate } from 'react-router-dom';
+import { Menu } from 'antd';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
 import './dashboard.css';
@@ -9,8 +9,6 @@ import AdminTours from '../../components/Admin/AdminTours/Tours.jsx';
 import AdminUsers from '../../components/Admin/AdminUsers/Users.jsx';
 import AdminReviews from '../../components/Admin/AdminReviews/Reviews.jsx';
 import AdminStatistics from '../../components/Admin/AdminStatistics/Statistics.jsx';
-
-const { TabPane } = Tabs;
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -40,24 +38,40 @@ const Dashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      <h2>Admin Dashboard</h2>
-      <Tabs defaultActiveKey="1">
-        <TabPane tab="Bookings" key="1">
-          <AdminBookings />
-        </TabPane>
-        <TabPane tab="Tours" key="2">
-          <AdminTours />
-        </TabPane>
-        <TabPane tab="Users" key="3">
-          <AdminUsers />
-        </TabPane>
-        <TabPane tab="Reviews" key="4">
-          <AdminReviews />
-        </TabPane>
-        <TabPane tab="Statistics" key="5">
-          <AdminStatistics />
-        </TabPane>
-      </Tabs>
+      <div className="admin-sidebar">
+        <h4>Management</h4>
+        <Menu 
+          mode="inline" 
+          defaultSelectedKeys={['5']}
+          style={{ height: '100%' }}
+        >
+          <Menu.Item key="1" onClick={() => navigate('/admin/bookings')}>
+            Bookings
+          </Menu.Item>
+          <Menu.Item key="2" onClick={() => navigate('/admin/tours')}>
+            Tours
+          </Menu.Item>
+          <Menu.Item key="3" onClick={() => navigate('/admin/users')}>
+            Users
+          </Menu.Item>
+          <Menu.Item key="4" onClick={() => navigate('/admin/reviews')}>
+            Reviews
+          </Menu.Item>
+          <Menu.Item key="5" onClick={() => navigate('/admin/statistics')}>
+            Statistics
+          </Menu.Item>
+        </Menu>
+      </div>
+      <div className="admin-content">
+        <Routes>
+          <Route path="bookings" element={<AdminBookings />} />
+          <Route path="tours" element={<AdminTours />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="reviews" element={<AdminReviews />} />
+          <Route path="statistics" element={<AdminStatistics />} />
+          <Route path="" element={<AdminStatistics />} />
+        </Routes>
+      </div>
     </div>
   );
 };

@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Badge } from 'reactstrap';
+import { Table, Button, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink, Input, FormGroup, Label, Row, Col } from 'reactstrap';
 import bookingService from '../../../services/bookingService';
 import './bookings.css';
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modal, setModal] = useState({
+    isOpen: false,
+    type: null,
+    bookingId: null,
+    newStatus: null
+  });
+  const [searchFilters, setSearchFilters] = useState({
+    customerName: '',
+    customerEmail: '',
+    customerPhone: '',
+    tourStatus: ''
+  });
+
+  const BOOKINGS_PER_PAGE = 8;
 
   useEffect(() => {
     fetchBookings();
@@ -14,7 +29,10 @@ const AdminBookings = () => {
   const fetchBookings = async () => {
     try {
       const response = await bookingService.getAllBookings();
-      setBookings(response.data || []);
+      const sortedBookings = (response.data || []).sort((a, b) => 
+        new Date(b.bookingDate) - new Date(a.bookingDate)
+      );
+      setBookings(sortedBookings);
     } catch (error) {
       console.error('Error fetching bookings:', error);
       if (error.message.includes('authentication')) {
@@ -26,33 +44,145 @@ const AdminBookings = () => {
     }
   };
 
-  const handleStatusUpdate = async (id, newStatus) => {
+  const toggleModal = () => {
+    setModal(prev => ({
+      ...prev,
+      isOpen: !prev.isOpen
+    }));
+  };
+
+  const handleStatusUpdateClick = (id, newStatus) => {
+    setModal({
+      isOpen: true,
+      type: 'status',
+      bookingId: id,
+      newStatus: newStatus
+    });
+  };
+
+  const handleDeleteClick = (id) => {
+    setModal({
+      isOpen: true,
+      type: 'delete',
+      bookingId: id,
+      newStatus: null
+    });
+  };
+
+  const handleConfirm = async () => {
     try {
-      await bookingService.updateBooking(id, { tourStatus: newStatus });
+      if (modal.type === 'status') {
+        await bookingService.updateBooking(modal.bookingId, { tourStatus: modal.newStatus });
+      } else if (modal.type === 'delete') {
+        await bookingService.deleteBooking(modal.bookingId);
+      }
       fetchBookings();
+      toggleModal();
     } catch (error) {
-      console.error('Error updating booking:', error);
-      alert('Failed to update booking status');
+      console.error('Error:', error);
+      alert(`Failed to ${modal.type === 'delete' ? 'delete booking' : 'update booking status'}`);
     }
   };
 
-  const handleDeleteBooking = async (id) => {
-    if (window.confirm('Are you sure you want to delete this booking?')) {
-      try {
-        await bookingService.deleteBooking(id);
-        fetchBookings();
-      } catch (error) {
-        console.error('Error deleting booking:', error);
-        alert('Failed to delete booking');
-      }
-    }
+  const getFilteredBookings = () => {
+    return bookings.filter(booking => {
+      const nameMatch = booking.customerName.toLowerCase().includes(searchFilters.customerName.toLowerCase());
+      const emailMatch = booking.customerEmail.toLowerCase().includes(searchFilters.customerEmail.toLowerCase());
+      const phoneMatch = booking.customerPhone.includes(searchFilters.customerPhone);
+      const statusMatch = !searchFilters.tourStatus || booking.tourStatus === searchFilters.tourStatus;
+
+      return nameMatch && emailMatch && phoneMatch && statusMatch;
+    });
   };
+
+  const filteredBookings = getFilteredBookings();
+  const indexOfLastBooking = currentPage * BOOKINGS_PER_PAGE;
+  const indexOfFirstBooking = indexOfLastBooking - BOOKINGS_PER_PAGE;
+  const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const totalPages = Math.ceil(filteredBookings.length / BOOKINGS_PER_PAGE);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const handleSearchChange = (e) => {
+    const { name, value } = e.target;
+    setSearchFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setCurrentPage(1);
+  };
+
+  const searchSection = (
+    <div className="search-filters mb-4">
+      <Row>
+        <Col md={3}>
+          <FormGroup>
+            <Label for="customerName">Customer Name</Label>
+            <Input
+              type="text"
+              name="customerName"
+              id="customerName"
+              placeholder="Search by name..."
+              value={searchFilters.customerName}
+              onChange={handleSearchChange}
+            />
+          </FormGroup>
+        </Col>
+        <Col md={3}>
+          <FormGroup>
+            <Label for="customerEmail">Email</Label>
+            <Input
+              type="text"
+              name="customerEmail"
+              id="customerEmail"
+              placeholder="Search by email..."
+              value={searchFilters.customerEmail}
+              onChange={handleSearchChange}
+            />
+          </FormGroup>
+        </Col>
+        <Col md={3}>
+          <FormGroup>
+            <Label for="customerPhone">Phone</Label>
+            <Input
+              type="text"
+              name="customerPhone"
+              id="customerPhone"
+              placeholder="Search by phone..."
+              value={searchFilters.customerPhone}
+              onChange={handleSearchChange}
+            />
+          </FormGroup>
+        </Col>
+        <Col md={3}>
+          <FormGroup>
+            <Label for="tourStatus">Status</Label>
+            <Input
+              type="select"
+              name="tourStatus"
+              id="tourStatus"
+              value={searchFilters.tourStatus}
+              onChange={handleSearchChange}
+            >
+              <option value="">All Status</option>
+              <option value="Paid">Paid</option>
+              <option value="Completed">Completed</option>
+              <option value="Canceled">Canceled</option>
+            </Input>
+          </FormGroup>
+        </Col>
+      </Row>
+    </div>
+  );
 
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="admin-bookings p-4">
       <h2>Bookings Management</h2>
+      
+      {searchSection}
+
       <Table responsive>
         <thead>
           <tr>
@@ -68,7 +198,7 @@ const AdminBookings = () => {
           </tr>
         </thead>
         <tbody>
-          {bookings.map((booking) => (
+          {currentBookings.map((booking) => (
             <tr key={booking._id}>
               <td>{booking.customerName}</td>
               <td>{booking.customerEmail}</td>
@@ -89,11 +219,11 @@ const AdminBookings = () => {
                 </Badge>
               </td>
               <td>
-                <div className="d-flex gap-2">
+                <div className="booking-actions">
                   <Button
                     color="success"
                     size="sm"
-                    onClick={() => handleStatusUpdate(booking._id, 'Completed')}
+                    onClick={() => handleStatusUpdateClick(booking._id, 'Completed')}
                     disabled={booking.tourStatus === 'Completed'}
                   >
                     Complete
@@ -101,7 +231,7 @@ const AdminBookings = () => {
                   <Button
                     color="warning"
                     size="sm"
-                    onClick={() => handleStatusUpdate(booking._id, 'Canceled')}
+                    onClick={() => handleStatusUpdateClick(booking._id, 'Canceled')}
                     disabled={booking.tourStatus === 'Canceled'}
                   >
                     Cancel
@@ -109,7 +239,7 @@ const AdminBookings = () => {
                   <Button
                     color="danger"
                     size="sm"
-                    onClick={() => handleDeleteBooking(booking._id)}
+                    onClick={() => handleDeleteClick(booking._id)}
                   >
                     Delete
                   </Button>
@@ -119,6 +249,43 @@ const AdminBookings = () => {
           ))}
         </tbody>
       </Table>
+
+      <div className="d-flex justify-content-center mt-4">
+        <Pagination>
+          <PaginationItem disabled={currentPage === 1}>
+            <PaginationLink previous onClick={() => paginate(currentPage - 1)} />
+          </PaginationItem>
+
+          {[...Array(totalPages)].map((_, index) => (
+            <PaginationItem key={index + 1} active={currentPage === index + 1}>
+              <PaginationLink onClick={() => paginate(index + 1)}>
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          <PaginationItem disabled={currentPage === totalPages}>
+            <PaginationLink next onClick={() => paginate(currentPage + 1)} />
+          </PaginationItem>
+        </Pagination>
+      </div>
+
+      <Modal isOpen={modal.isOpen} toggle={toggleModal}>
+        <ModalHeader toggle={toggleModal}>Confirm Action</ModalHeader>
+        <ModalBody>
+          {modal.type === 'status' 
+            ? `Are you sure you want to mark this booking as ${modal.newStatus?.toLowerCase()}?`
+            : 'Are you sure you want to delete this booking?'}
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={handleConfirm}>
+            Confirm
+          </Button>
+          <Button color="secondary" onClick={toggleModal}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };
