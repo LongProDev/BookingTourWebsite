@@ -102,6 +102,7 @@
   opacity: 1;
 }
 
+
 .schedule-item {
   border: 1px solid #eee;
   transition: all 0.3s ease;
@@ -123,5 +124,79 @@
 
 .schedules-list {
   margin-top: 15px;
+}
+
+.tour-reviews {
+  border-top: 1px solid #eee;
+  padding-top: 2rem;
+}
+
+.review-form {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.review-item {
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.review-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.review-item .text-muted {
+  font-size: 0.9rem;
+}
+
+.reviews-list {
+  margin-top: 2rem;
+}
+
+.review-form textarea {
+  resize: vertical;
+}
+
+.review-form button {
+  background-color: #faa935;
+  border: none;
+}
+
+.review-form button:hover {
+  background-color: #e69729;
+}
+
+.tour__rating {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.rating__number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--heading-color);
+}
+
+.rating__number i {
+  color: var(--secondary-color);
+}
+
+/* Modal styles */
+.modal-body i {
+  font-size: 3rem;
+  color: #28a745;
+}
+
+.modal-body h4 {
+  color: var(--heading-color);
+  margin: 1rem 0;
+}
+
+.modal-body p {
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
 }
  

@@ -2,49 +2,26 @@ import Tour from '../models/Tour.js';
 import Booking from '../models/Booking.js';
 import User from '../models/User.js';
 
-export const StatisticsController = {
-    getDashboardStats: async (req, res) => {
-        try {
-          const [totalBookings, totalRevenue, totalUsers, totalTours] = await Promise.all([
-            Booking.countDocuments(),
-            Booking.aggregate([
-              { $match: { tourStatus: 'Completed' } },
-              { $group: { _id: null, total: { $sum: '$totalPrice' } } }
-            ]),
-            User.countDocuments(),
-            Tour.countDocuments()
-          ]);
-    
-          res.status(200).json({
-            success: true,
-            data: {
-              totalBookings,
-              totalRevenue: totalRevenue[0]?.total || 0,
-              totalUsers,
-              totalTours
-            }
-          });
-        } catch (error) {
-          res.status(500).json({
-            success: false,
-            message: error.message
-          });
-        }
-      },
-    
-
-  getRevenueStats: async (req, res) => {
+const StatisticsController = {
+  getAllStats: async (req, res) => {
     try {
-      const { period = 'monthly' } = req.query;
-      
+      // Get the date range for the last 12 months
       const currentDate = new Date();
-      const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 11, 1);
-      
-      const revenueData = await Booking.aggregate([
+      const startDate = new Date(currentDate);
+      startDate.setMonth(startDate.getMonth() - 11);
+      startDate.setDate(1);
+      startDate.setHours(0, 0, 0, 0);
+
+      console.log('Date range:', { startDate, currentDate });
+
+      // Get monthly user registrations
+      const userRegistrations = await User.aggregate([
         {
           $match: {
-            tourStatus: 'Completed',
-            createdAt: { $gte: startDate }
+            createdAt: { 
+              $gte: startDate,
+              $lte: currentDate 
+            }
           }
         },
         {
@@ -53,29 +30,125 @@ export const StatisticsController = {
               year: { $year: '$createdAt' },
               month: { $month: '$createdAt' }
             },
-            revenue: { $sum: '$totalPrice' }
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1 } }
+      ]);
+      
+      // Get monthly successful bookings
+      const successfulBookings = await Booking.aggregate([
+        {
+          $match: {
+            createdAt: { 
+              $gte: startDate,
+              $lte: currentDate 
+            },
+            tourStatus: 'Completed'
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' }
+            },
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1 } }
+      ]);
+      // Get monthly revenue
+      const monthlyRevenue = await Booking.aggregate([
+        {
+          $match: {
+            createdAt: { 
+              $gte: startDate,
+              $lte: currentDate 
+            },
+            tourStatus: 'Completed'
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' }
+            },
+            total: { $sum: '$totalPrice' }
+          }
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1 } }
+      ]);
+      // Get new tours created
+      const newTours = await Tour.aggregate([
+        {
+          $match: {
+            createdAt: { 
+              $gte: startDate,
+              $lte: currentDate 
+            }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' }
+            },
+            count: { $sum: 1 }
           }
         },
         { $sort: { '_id.year': 1, '_id.month': 1 } }
       ]);
 
-      const labels = [];
-      const values = [];
-      
-      revenueData.forEach(data => {
-        labels.push(`${data._id.month}/${data._id.year}`);
-        values.push(data.revenue);
-      });
+      // Format data to include all months with zero values for missing months
+      const formatData = (data, valueKey = 'count') => {
+        const months = Array.from({ length: 12 }, (_, i) => {
+          const date = new Date();
+          date.setUTCMonth(date.getUTCMonth() - (11 - i));
+          date.setUTCDate(1);
+          return {
+            year: date.getUTCFullYear(),
+            month: date.getUTCMonth() + 1,
+            value: 0
+          };
+        });
+
+        console.log('Raw aggregation data:', data);
+
+        data.forEach(item => {
+          const index = months.findIndex(m => 
+            m.year === item._id.year && m.month === item._id.month
+          );
+          if (index !== -1) {
+            months[index].value = item[valueKey] || 0;
+          }
+        });
+
+        return {
+          labels: months.map(m => `${m.month}/${m.year}`),
+          values: months.map(m => m.value)
+        };
+      };
 
       res.status(200).json({
         success: true,
-        data: { labels, values }
+        data: {
+          userRegistrations: formatData(userRegistrations),
+          successfulBookings: formatData(successfulBookings),
+          monthlyRevenue: formatData(monthlyRevenue, 'total'),
+          newTours: formatData(newTours)
+        }
       });
     } catch (error) {
+      console.error('Statistics error:', error);
       res.status(500).json({
         success: false,
         message: error.message
       });
     }
   }
-}; 
+};
+
+export default StatisticsController; 

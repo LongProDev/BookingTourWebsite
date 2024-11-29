@@ -33,6 +33,11 @@
     border-radius: 3px 0 0 0;
 }
 
+.card__top{
+  display: flex;
+  flex-direction: column;
+}
+
 .card__top span i{
     color: var(--secondary-color);
 }
@@ -42,13 +47,37 @@
     color: var(--text-color);
 }
 
+.tour__startlocation{
+    color: var(--heading-color);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-align: left;
+    display: flex;
+}
+.tour__rating span{
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: left;
+  display: flex;
+  
+}
+
+.tour__time{
+    color: var(--heading-color);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-align: left;
+    display: flex;
+}
+
 .tour__location{
     color: var(--heading-color);
     font-weight: 500;
     font-size: 0.9rem;
+    text-align: left;
+    display: flex;
 }
 
-.tour__rating i,
 .tour__location i {
     font-size: 1rem;
 }

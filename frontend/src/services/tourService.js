@@ -21,6 +21,15 @@ const tourService = {
     }
   },
 
+  getReviews: async (tourId) => {
+    try {
+      const response = await api.get(`/tours/${tourId}/reviews`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
   createTour: async (tourData) => {
     try {
       const response = await api.post('/tours', tourData, {
@@ -48,6 +57,19 @@ const tourService = {
     try {
       const response = await api.patch(`/tours/${tourId}/schedules/${scheduleId}/seats`, {
         bookedSeats: totalBookedSeats
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  createReview: async (reviewData) => {
+    try {
+      const response = await api.post(`/reviews`, reviewData, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       });
       return response.data;
     } catch (error) {

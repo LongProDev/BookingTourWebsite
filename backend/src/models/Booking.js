@@ -43,7 +43,7 @@ const bookingSchema = new mongoose.Schema({
     ref: "Tour",
     required: true,
   },
-});
+},{ timestamps: true });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 

@@ -1,4 +1,5 @@
 import Review from "../models/Review.js";
+import Tour from "../models/Tour.js";
 
 const reviewController = {
   getAllReviews: async (req, res) => {
@@ -22,6 +23,10 @@ const reviewController = {
         userId: req.user.id
       });
       await review.save();
+
+      // Update tour rating statistics
+      await Tour.updateRatingStats(review.tourId);
+
       res.status(201).json({
         success: true,
         data: review
@@ -33,7 +38,19 @@ const reviewController = {
 
   deleteReview: async (req, res) => {
     try {
-      await Review.findByIdAndDelete(req.params.id);
+      const review = await Review.findById(req.params.id);
+      if (!review) {
+        return res.status(404).json({
+          success: false,
+          message: "Review not found"
+        });
+      }
+
+      await review.deleteOne();
+      
+      // Update tour rating statistics after deletion
+      await Tour.updateRatingStats(review.tourId);
+
       res.status(200).json({
         success: true,
         message: "Review deleted successfully"

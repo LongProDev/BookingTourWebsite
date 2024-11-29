@@ -1,10 +1,9 @@
 import express from 'express';
-import { StatisticsController } from '../controllers/StatisticsController.js';
-import { verifyAdmin } from '../utils/verifyToken.js';
+import StatisticsController from '../controllers/StatisticsController.js';
+import adminMiddleware from '../middlewares/adminMiddleware.js';
 
 const router = express.Router();
 
-router.get('/dashboard', verifyAdmin, StatisticsController.getDashboardStats);
-router.get('/revenue', verifyAdmin, StatisticsController.getRevenueStats);
+router.get('/all', adminMiddleware, StatisticsController.getAllStats);
 
 export default router; 

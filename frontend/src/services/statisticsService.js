@@ -1,12 +1,12 @@
 import api from './api';
 
 const statisticsService = {
-  getDashboardStats: async () => {
+  getAllStats: async () => {
     try {
-      const response = await api.get('/statistics/dashboard');
+      const response = await api.get('/statistics/all');
       return response.data;
     } catch (error) {
-      console.error('Error fetching dashboard statistics:', error);
+      console.error('Error fetching statistics:', error);
       throw error;
     }
   }

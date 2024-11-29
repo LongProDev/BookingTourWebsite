@@ -94,12 +94,6 @@ const PaymentConfirmation = () => {
                     >
                       Pay Now
                     </Button>
-                    <Button 
-                      color="secondary" 
-                      onClick={() => handlePaymentChoice('PAY_LATER')}
-                    >
-                      Pay Later
-                    </Button>
                   </div>
                 </div>
               </div>

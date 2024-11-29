@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Badge } from 'reactstrap';
-import reviewService from '../../../services/reviewService';
+import { toast } from 'react-hot-toast';
 import './reviews.css';
+import { BASE_URL } from '../../../utils/config';
 
-const Reviews = () => {
+const AdminReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,56 +14,74 @@ const Reviews = () => {
 
   const fetchReviews = async () => {
     try {
-      const response = await reviewService.getAllReviews();
-      if (response.success) {
-        setReviews(response.data);
+      const response = await fetch(`${BASE_URL}/reviews`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setReviews(data.data);
       }
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching reviews:', error);
-    } finally {
+      toast.error('Failed to fetch reviews');
       setLoading(false);
     }
   };
 
-  const handleDeleteReview = async (id) => {
-    if (window.confirm('Are you sure you want to delete this review?')) {
-      try {
-        await reviewService.deleteReview(id);
-        fetchReviews();
-      } catch (error) {
-        console.error('Error deleting review:', error);
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        toast.success('Review deleted successfully');
+        setReviews(reviews.filter(review => review._id !== reviewId));
+      } else {
+        toast.error('Failed to delete review');
       }
+    } catch (error) {
+      toast.error('Error deleting review');
     }
   };
 
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="admin-reviews p-4">
-      <h2>Reviews Management</h2>
+    <div className="admin-reviews">
+      <h2>Review Management</h2>
       <Table responsive>
         <thead>
           <tr>
-            <th>Tour</th>
             <th>User</th>
+            <th>Tour</th>
             <th>Rating</th>
             <th>Comment</th>
+            <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {reviews.map((review) => (
             <tr key={review._id}>
-              <td>{review.tourId.name}</td>
-              <td>{review.userId.username}</td>
+              <td>{review.userId?.username || 'Unknown User'}</td>
+              <td>{review.tourId?.name || 'Unknown Tour'}</td>
               <td>
-                <Badge color="warning">{review.rating} ★</Badge>
+                <Badge color="info">{review.rating} ★</Badge>
               </td>
-              <td>{review.comment}</td>
+              <td className="comment-cell">{review.comment}</td>
+              <td>{new Date(review.createdAt).toLocaleDateString()}</td>
               <td>
-                <Button
-                  color="danger"
-                  size="sm"
+                <Button 
+                  color="danger" 
+                  size="sm" 
                   onClick={() => handleDeleteReview(review._id)}
                 >
                   Delete
@@ -76,4 +95,4 @@ const Reviews = () => {
   );
 };
 
-export default Reviews; 
+export default AdminReviews; 

@@ -14,6 +14,7 @@ import authRoute from "./src/routes/AuthRouters.js";
 import bookingRoute from "./src/routes/BookingRouters.js";
 import statisticsRoute from "./src/routes/StatisticsRouters.js";
 import paymentRoute from "./src/routes/PaymentRouters.js";
+import reviewRoute from "./src/routes/ReviewRouters.js";
 
 dotenv.config();
 
@@ -51,8 +52,9 @@ app.use("/api/tours", tourRoute);
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/bookings", bookingRoute);
-app.use('/api/statistics', statisticsRoute);
 app.use('/api/payments', paymentRoute);
+app.use('/api/statistics', statisticsRoute);
+app.use("/api/reviews", reviewRoute);
 
 const requiredEnvVars = ['MONGODB_URI', 'STRIPE_SECRET_KEY', 'CLIENT_URL'];
 const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);

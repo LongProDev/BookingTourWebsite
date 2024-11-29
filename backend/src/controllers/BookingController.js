@@ -1,6 +1,6 @@
 import Booking from "../models/Booking.js";
 import Tour from "../models/Tour.js";
-import { sendBookingConfirmationEmail, sendPayLaterEmail } from '../services/emailService.js';
+import { sendBookingConfirmationEmail } from '../services/emailService.js';
 
 const bookingController = {
   // Get all bookings
@@ -227,15 +227,6 @@ const bookingController = {
           await sendBookingConfirmationEmail(booking);
         } catch (emailError) {
           console.error('Email sending failed:', emailError);
-          // Continue with the response even if email fails
-        }
-      }
-
-      if (paymentStatus === 'Pending') {
-        try {
-          await sendPayLaterEmail(booking);
-        } catch (emailError) {
-          console.error('Pay later email sending failed:', emailError);
           // Continue with the response even if email fails
         }
       }
