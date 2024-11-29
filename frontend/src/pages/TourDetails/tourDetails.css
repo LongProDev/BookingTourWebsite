@@ -11,7 +11,7 @@
 }
 
 .summary-item {
-  display: flex;
+  display: block;
   align-items: center;
   gap: 10px;
   margin: 15px 0;

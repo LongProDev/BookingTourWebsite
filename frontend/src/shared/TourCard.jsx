@@ -29,7 +29,7 @@ const TourCard = ({ tour }) => {
       </Card>
 
       <CardBody>
-        <div className="tour__rating justify-content-between gap-1">
+        <div className="tour__rating">
           <span className="rating__number">
             {tour?.ratingStats?.averageRating?.toFixed(1)}{" "}
             <i className="ri-star-fill"></i>

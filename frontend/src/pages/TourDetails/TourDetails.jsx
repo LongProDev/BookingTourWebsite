@@ -28,7 +28,7 @@ const TourDetails = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [review, setReview] = useState({
     rating: 5,
-    comment: ""
+    comment: "",
   });
   const [reviews, setReviews] = useState([]);
   const [showThankYouModal, setShowThankYouModal] = useState(false);
@@ -38,9 +38,9 @@ const TourDetails = () => {
       const response = await tourService.getTourById(id);
       if (response && response.data) {
         const tourData = response.data;
-        tourData.image = tourData.image.map(img => 
-          img.startsWith('http') 
-            ? img 
+        tourData.image = tourData.image.map((img) =>
+          img.startsWith("http")
+            ? img
             : `${process.env.REACT_APP_API_URL}/images/${img}`
         );
         setTour(tourData);
@@ -72,7 +72,8 @@ const TourDetails = () => {
     if (!tour || isPaused) return;
 
     const interval = setInterval(() => {
-      const nextIndex = activeIndex === tour.image.length - 1 ? 0 : activeIndex + 1;
+      const nextIndex =
+        activeIndex === tour.image.length - 1 ? 0 : activeIndex + 1;
       setActiveIndex(nextIndex);
     }, 2000);
 
@@ -81,13 +82,15 @@ const TourDetails = () => {
 
   const next = () => {
     if (animating) return;
-    const nextIndex = activeIndex === tour.image.length - 1 ? 0 : activeIndex + 1;
+    const nextIndex =
+      activeIndex === tour.image.length - 1 ? 0 : activeIndex + 1;
     setActiveIndex(nextIndex);
   };
 
   const previous = () => {
     if (animating) return;
-    const nextIndex = activeIndex === 0 ? tour.image.length - 1 : activeIndex - 1;
+    const nextIndex =
+      activeIndex === 0 ? tour.image.length - 1 : activeIndex - 1;
     setActiveIndex(nextIndex);
   };
 
@@ -97,8 +100,8 @@ const TourDetails = () => {
   };
 
   const handleImageError = (e) => {
-    console.error('Image failed to load:', e.target.src);
-    e.target.src = '/images/placeholder.jpg';
+    console.error("Image failed to load:", e.target.src);
+    e.target.src = "/images/placeholder.jpg";
   };
 
   const handleMouseEnter = () => setIsPaused(true);
@@ -110,9 +113,9 @@ const TourDetails = () => {
       const response = await tourService.createReview({
         tourId: id,
         rating: review.rating,
-        comment: review.comment
+        comment: review.comment,
       });
-      
+
       if (response.success) {
         setShowThankYouModal(true);
         setReview({ rating: 5, comment: "" });
@@ -146,7 +149,7 @@ const TourDetails = () => {
   const reviewSection = (
     <div className="tour-reviews mt-5">
       <h5>Reviews</h5>
-      
+
       <Form onSubmit={handleReviewSubmit} className="review-form mb-4">
         <FormGroup>
           <Label for="rating">Rating</Label>
@@ -155,7 +158,9 @@ const TourDetails = () => {
             name="rating"
             id="rating"
             value={review.rating}
-            onChange={(e) => setReview({ ...review, rating: parseInt(e.target.value) })}
+            onChange={(e) =>
+              setReview({ ...review, rating: parseInt(e.target.value) })
+            }
           >
             <option value="5">⭐⭐⭐⭐⭐ (5)</option>
             <option value="4">⭐⭐⭐⭐ (4)</option>
@@ -164,7 +169,7 @@ const TourDetails = () => {
             <option value="1">⭐ (1)</option>
           </Input>
         </FormGroup>
-        
+
         <FormGroup>
           <Label for="comment">Your Review</Label>
           <Input
@@ -177,7 +182,7 @@ const TourDetails = () => {
             rows="4"
           />
         </FormGroup>
-        
+
         <Button color="primary" type="submit">
           Submit Review
         </Button>
@@ -187,9 +192,7 @@ const TourDetails = () => {
         {reviews.map((review, index) => (
           <div key={index} className="review-item p-3 mb-2 bg-light rounded">
             <div className="d-flex justify-content-between">
-              <div>
-                {'⭐'.repeat(review.rating)}
-              </div>
+              <div>{"⭐".repeat(review.rating)}</div>
               <small className="text-muted">
                 {new Date(review.createdAt).toLocaleDateString()}
               </small>
@@ -238,13 +241,14 @@ const TourDetails = () => {
                 </div>
 
                 <div className="tour-info">
-                    <div className="tour__rating d-flex align-items-center gap-3">
-                      <span className="rating__number">
-                        {tour?.ratingStats?.averageRating?.toFixed(1)} <i className="ri-star-fill"></i>
-                      </span>
-                      <span>({tour?.ratingStats?.numberOfReviews} reviews)</span>
-                    </div>
-                  
+                  <div className="tour__rating d-flex align-items-center gap-3">
+                    <span className="rating__number">
+                      {tour?.ratingStats?.averageRating?.toFixed(1)}{" "}
+                      <i className="ri-star-fill"></i>
+                    </span>
+                    <span>({tour?.ratingStats?.numberOfReviews} reviews)</span>
+                  </div>
+
                   <h2>{tour.name}</h2>
                   <h5>Description</h5>
                   <div dangerouslySetInnerHTML={{ __html: tour.description }} />
@@ -253,22 +257,34 @@ const TourDetails = () => {
                     {tour.schedules && tour.schedules.length > 0 ? (
                       <div className="schedules-list">
                         {tour.schedules.map((schedule, index) => (
-                          <div key={schedule._id} className="schedule-item p-3 mb-2 bg-light rounded">
+                          <div
+                            key={schedule._id}
+                            className="schedule-item p-3 mb-2 bg-light rounded"
+                          >
                             <h6>Schedule {index + 1}</h6>
                             <div className="d-flex flex-wrap gap-3">
                               <span>
-                                <i className="ri-calendar-line"></i> Departure:{' '}
-                                {new Date(schedule.departureDate).toLocaleDateString()} at {schedule.departureTime}
+                                <i className="ri-calendar-line"></i> Departure:{" "}
+                                {new Date(
+                                  schedule.departureDate
+                                ).toLocaleDateString()}{" "}
+                                at {schedule.departureTime}
                               </span>
                               <span>
-                                <i className="ri-calendar-check-line"></i> Return:{' '}
-                                {new Date(schedule.returnDate).toLocaleDateString()} at {schedule.returnTime}
+                                <i className="ri-calendar-check-line"></i>{" "}
+                                Return:{" "}
+                                {new Date(
+                                  schedule.returnDate
+                                ).toLocaleDateString()}{" "}
+                                at {schedule.returnTime}
                               </span>
                               <span>
-                                <i className="ri-user-line"></i> Available Seats: {schedule.availableSeats}
+                                <i className="ri-user-line"></i> Available
+                                Seats: {schedule.availableSeats}
                               </span>
                               <span>
-                                <i className="ri-money-dollar-circle-line"></i> Price: ${schedule.price}
+                                <i className="ri-money-dollar-circle-line"></i>{" "}
+                                Price: ${schedule.price}
                               </span>
                             </div>
                           </div>
@@ -284,34 +300,42 @@ const TourDetails = () => {
             </Col>
 
             <Col lg="4">
-              <div className="booking-info mt-4">
-                <div className="tour__info">
-                  <h3>Information</h3>
-                  <div className="d-flex align-items-center gap-5">
-                    <span className="tour__rating d-flex align-items-center gap-1">
-                      <i className="ri-time-line"></i> {tour.time}
-                    </span>
-                    <span className="tour__location d-flex align-items-center gap-1">
-                      <i className="ri-map-pin-line"></i> {tour.location}
-                    </span>
-                  </div>
-                  <h5 className="mt-3">Price: ${tour.price} per person</h5>
-                  <Button className="w-100 mt-4 booking__btn">
-                    <Link
-                      to={`/tours/${tour._id}/booking`}
-                      style={{ color: "white", textDecoration: "none" }}
-                    >
-                      Book Now
-                    </Link>
-                  </Button>
+              <div className="tour-summary">
+                <h2>About this tour</h2>
+                <div className="summary-item">
+                  <i className="ri-map-pin-line"></i>
+                  <span>Departure: {tour.startLocation}</span>
                 </div>
+                <div className="summary-item">
+                  <i className="ri-map-pin-line"></i>
+                  <span>Destination: {tour.location}</span>
+                </div>
+                <div className="summary-item">
+                  <i className="ri-group-line"></i>
+                  <span>Group Size: {tour.maxPeople} people</span>
+                </div>
+                <div className="summary-item">
+                  <i className="ri-time-line"></i>
+                  <span>Duration: {tour.time}</span>
+                </div>
+                <div className="summary-price">
+                  <h4>${tour.price}</h4>
+                  <span>/person</span>
+                </div>
+                <Button className="w-100 mt-3 booking__btn">
+                  <Link
+                    to={`/tours/${tour._id}/booking`}
+                    style={{ color: "white", textDecoration: "none" }}
+                  >
+                    Book Now
+                  </Link>
+                </Button>
               </div>
             </Col>
           </Row>
         </Container>
       </section>
 
-     
       <Modal
         isOpen={showThankYouModal}
         toggle={() => setShowThankYouModal(false)}
@@ -333,4 +357,4 @@ const TourDetails = () => {
   );
 };
 
-export default TourDetails; 
+export default TourDetails;

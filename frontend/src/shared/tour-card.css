@@ -45,6 +45,10 @@
 .tour__rating{
     font-size: 0.9rem;
     color: var(--text-color);
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem 0 0 ;
+    height: fit-content;
 }
 
 .tour__startlocation{
