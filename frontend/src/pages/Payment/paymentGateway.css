@@ -1,5 +1,40 @@
 .payment-gateway {
-  padding: 80px 0;
+  padding: 5rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Tablet breakpoint */
+@media (min-width: 768px) {
+  .payment-gateway {
+    padding: 5rem 2rem;
+  }
+
+  .payment-form {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .form-group {
+    flex: 0 0 calc(50% - 1rem);
+  }
+}
+
+/* Desktop breakpoint */
+@media (min-width: 1024px) {
+  .payment-gateway {
+    padding: 5rem 3rem;
+  }
+
+  .form-group {
+    flex: 0 0 calc(33.333% - 1rem);
+  }
 }
 
 .qr-container {

@@ -187,7 +187,7 @@ const Booking = () => {
               <div className="contact-info mt-4">
                 <h4>Contact Information</h4>
                 <FormGroup>
-                  <Label>Full Name</Label>
+                  <Label>Full Name*</Label>
                   <Input
                     type="text"
                     value={formData.customerName}
@@ -198,7 +198,7 @@ const Booking = () => {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label>Email</Label>
+                  <Label>Email*</Label>
                   <Input
                     type="email"
                     value={formData.customerEmail}
@@ -212,7 +212,7 @@ const Booking = () => {
                   />
                 </FormGroup>
                 <FormGroup>
-                  <Label>Phone</Label>
+                  <Label>Phone*</Label>
                   <Input
                     type="tel"
                     value={formData.customerPhone}
@@ -229,11 +229,11 @@ const Booking = () => {
 
               {/* Passenger Information */}
               <div className="passenger-info mt-4">
-                <h4>Number of Passengers</h4>
+                <h4>Number of Passengers*</h4>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Adults</Label>
+                      <Label>Adults*</Label>
                       <Input
                         type="number"
                         min="1"
@@ -247,7 +247,7 @@ const Booking = () => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Children (under 12)</Label>
+                      <Label>Children* (under 12)</Label>
                       <Input
                         type="number"
                         min="0"
@@ -275,7 +275,7 @@ const Booking = () => {
 
               {/* Payment Method */}
               <div className="payment-method mt-4">
-                <h4>Payment Method</h4>
+                <h4>Payment Method*</h4>
                 <FormGroup tag="fieldset">
                   <FormGroup check>
                     <Label check>
@@ -293,23 +293,6 @@ const Booking = () => {
                         required
                       />{" "}
                       Stripe
-                    </Label>
-                  </FormGroup>
-                  <FormGroup check>
-                    <Label check>
-                      <Input
-                        type="radio"
-                        name="paymentMethod"
-                        value="MoMo"
-                        checked={formData.paymentMethod === "MoMo"}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            paymentMethod: e.target.value,
-                          })
-                        }
-                      />{" "}
-                      MoMo
                     </Label>
                   </FormGroup>
                 </FormGroup>

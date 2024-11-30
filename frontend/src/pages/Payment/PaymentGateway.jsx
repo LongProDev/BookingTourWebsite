@@ -7,7 +7,6 @@ import { toast } from 'react-hot-toast';
 import paymentService from '../../services/paymentService';
 
 // Initialize Stripe outside component to prevent multiple initializations
-
 const stripePromise = process.env.REACT_APP_STRIPE_PUBLIC_KEY 
   ? loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY)
   : null;
@@ -71,24 +70,15 @@ const PaymentGateway = () => {
         throw new Error('Please select a payment method');
       }
 
-      if (bookingData.paymentMethod === 'Stripe') {
-        if (!stripePromise) {
-          throw new Error('Payment system is not properly configured. Please contact support.');
-        }
+      if (!stripePromise) {
+        throw new Error('Payment system is not properly configured. Please contact support.');
+      }
 
-        const response = await paymentService.createStripeCheckout(bookingData);
-        if (response.url) {
-          window.location.href = response.url;
-        } else {
-          throw new Error('Invalid Stripe payment response');
-        }
-      } else if (bookingData.paymentMethod === 'MoMo') {
-        const momoResponse = await paymentService.createMoMoPayment(bookingData);
-        if (momoResponse.payUrl) {
-          window.location.href = momoResponse.payUrl;
-        } else {
-          throw new Error('Invalid MoMo payment response');
-        }
+      const response = await paymentService.createStripeCheckout(bookingData);
+      if (response.url) {
+        window.location.href = response.url;
+      } else {
+        throw new Error('Invalid payment response');
       }
     } catch (error) {
       console.error('Error processing payment:', error);

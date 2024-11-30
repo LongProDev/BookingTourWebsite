@@ -14,7 +14,7 @@ const bookingSchema = new mongoose.Schema({
   notes: { type: String },
   paymentMethod: { 
     type: String, 
-    enum: ['Stripe', 'MoMo'],
+    enum: ['Stripe'],
     required: true 
   },
   agreedToPolicy: { type: Boolean, required: true },

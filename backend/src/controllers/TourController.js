@@ -201,7 +201,14 @@ const TourController = {
           new: true,
           runValidators: true
         }
-      );
+      ).catch(error => {
+        console.error('MongoDB Update Error:', {
+          name: error.name,
+          message: error.message,
+          errors: error.errors
+        });
+        throw error;
+      });
 
       if (!tour) {
         return res.status(404).json({
