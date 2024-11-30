@@ -23,6 +23,7 @@ import BookingSuccess from "../pages/Booking/BookingSuccess.jsx";
 import AdminReviews from "../components/Admin/AdminReviews/Reviews.jsx";
 import ForgotPassword from "../components/ForgotPassword/ForgotPassword.jsx";
 import BookingHistory from "../components/BookingHistory/BookingHistory.jsx";
+import About from "../pages/About/About.jsx";
 
 
 const Routers = () => {
@@ -30,6 +31,7 @@ const Routers = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Home />} />
+      <Route path="/about" element={<About />} />
       <Route path="/tours" element={<Tours />} />
       <Route path="/tours/search" element={<SearchResultList />} />
       <Route path="/tours/:id" element={<TourDetails />} />
@@ -38,6 +40,7 @@ const Routers = () => {
       <Route path="/account" element={<ProtectedRoute noAdmin><Account /></ProtectedRoute>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/my-bookings" element={<BookingHistory />} />
+      
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="tours" element={<AdminTours />} />
