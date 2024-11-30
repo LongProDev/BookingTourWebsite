@@ -268,6 +268,24 @@ const bookingController = {
         message: 'Failed to get booking payment status'
       });
     }
+  },
+
+  getBookingsByEmail: async (req, res) => {
+    try {
+      const { email } = req.params;
+      const bookings = await Booking.find({ customerEmail: email })
+        .sort({ bookingDate: -1 });
+
+      res.status(200).json({
+        success: true,
+        data: bookings
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
   }
 };
 

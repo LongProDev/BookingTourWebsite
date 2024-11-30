@@ -56,7 +56,7 @@ const PaymentSuccess = () => {
                 <h4>Booking Details</h4>
                 <p><strong>Booking ID:</strong> {booking?._id}</p>
                 <p><strong>Tour:</strong> {booking?.tourName}</p>
-                <p><strong>Date:</strong> {new Date(booking?.scheduleDate).toLocaleDateString()}</p>
+                
                 <p><strong>Total Amount Paid:</strong> ${booking?.totalPrice}</p>
                 <p><strong>Status:</strong> <span className="text-success">Paid</span></p>
               </div>

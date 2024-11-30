@@ -22,6 +22,7 @@ import PaymentSuccess from "../pages/Payment/PaymentSuccess.jsx";
 import BookingSuccess from "../pages/Booking/BookingSuccess.jsx";
 import AdminReviews from "../components/Admin/AdminReviews/Reviews.jsx";
 import ForgotPassword from "../components/ForgotPassword/ForgotPassword.jsx";
+import BookingHistory from "../components/BookingHistory/BookingHistory.jsx";
 
 
 const Routers = () => {
@@ -36,7 +37,7 @@ const Routers = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<ProtectedRoute noAdmin><Account /></ProtectedRoute>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-
+      <Route path="/my-bookings" element={<BookingHistory />} />
 
       <Route path="/admin" element={<AdminLayout />}>
         <Route path="tours" element={<AdminTours />} />

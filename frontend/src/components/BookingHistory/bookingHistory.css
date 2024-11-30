@@ -1,0 +1,30 @@
+.booking-history {
+  padding: 50px 0;
+}
+
+.booking-history h2 {
+  margin-bottom: 30px;
+  color: var(--heading-color);
+}
+
+.booking-history table {
+  background: var(--secondary-color);
+  box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+  margin-bottom: 30px;
+}
+
+.booking-history th {
+  padding: 15px !important;
+  color: var(--heading-color);
+}
+
+.booking-history td {
+  padding: 15px !important;
+  color: var(--text-color);
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  padding: 20px;
+} 

@@ -60,6 +60,15 @@ const bookingService = {
       console.error('Payment update error:', error);
       throw error.response?.data || error;
     }
+  },
+
+  getBookingsByEmail: async (email) => {
+    try {
+      const response = await api.get(`/bookings/user/email/${email}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
   }
 };
 

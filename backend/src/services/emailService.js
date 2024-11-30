@@ -25,7 +25,7 @@ transporter.verify(function (error, success) {
 export const sendBookingConfirmationEmail = async (booking) => {
   try {
     const mailOptions = {
-      from: '"Tour Booking" <thanhlongn08@gmail.com>',
+      from: '"TravelEasy" <thanhlongn08@gmail.com>',
       to: booking.customerEmail,
       subject: "Tour Booking Confirmation",
       html: `
@@ -48,7 +48,7 @@ export const sendBookingConfirmationEmail = async (booking) => {
           <li>Children: ${booking.numberOfChildren}</li>
           <li>Total Amount: $${booking.totalPrice}</li>
         </ul>
-        <p>If you have any questions, please contact us via email: thanhlongn08@gmail.com or hotline: 0966441683</p>
+        <p>If you have any questions, please contact us via email: traveleasy@gmail.com or hotline: 098386868686</p>
       `,
     };
 
