@@ -43,6 +43,10 @@ const UserDropdown = () => {
             <i className="ri-user-settings-line"></i>
             Account Settings
           </Link>
+          <Link to="/my-bookings" className="dropdown-item">
+            <i className="ri-history-line"></i>
+            Booking History
+            </Link>
           <button onClick={handleLogout} className="dropdown-item">
             <i className="ri-logout-box-line"></i>
             Logout
