@@ -1,4 +1,5 @@
 import api from './api';
+import axios from 'axios';
 
 const tourService = {
   getAllTours: async (page = 0, limit = 8) => {
@@ -23,9 +24,12 @@ const tourService = {
 
   getReviews: async (tourId) => {
     try {
-      const response = await api.get(`/tours/${tourId}/reviews`);
+      console.log("Calling getReviews for tourId:", tourId);
+      const response = await api.get(`/reviews/tour/${tourId}`);
+      console.log("API response for reviews:", response);
       return response.data;
     } catch (error) {
+      console.error("Error in getReviews:", error);
       throw error;
     }
   },
@@ -44,8 +48,16 @@ const tourService = {
   },
 
   updateTour: async (id, tourData) => {
-    const response = await api.put(`/tours/${id}`, tourData);
-    return response.data;
+    try {
+      const response = await api.put(`/tours/${id}`, tourData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
   deleteTour: async (id) => {
@@ -74,6 +86,22 @@ const tourService = {
       return response.data;
     } catch (error) {
       throw error;
+    }
+  },
+
+  deleteSchedule: async (tourId, scheduleId) => {
+    try {
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_URL}/api/tours/${tourId}/schedules/${scheduleId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
     }
   }
 };

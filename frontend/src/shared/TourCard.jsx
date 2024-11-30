@@ -1,11 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardBody } from "reactstrap";
 import { Link } from "react-router-dom";
 import "./tour-card.css";
 
 const TourCard = ({ tour }) => {
-  const { _id, name, image, time, startLocation, location, price, featured } =
-    tour;
+  const {
+    _id,
+    name,
+    image,
+    time,
+    startLocation,
+    location,
+    price,
+    featured,
+    schedules,
+  } = tour;
 
   const [imgSrc, setImgSrc] = useState(() => {
     if (!image || !image[0]) return "/images/placeholder.jpg";
@@ -13,6 +22,11 @@ const TourCard = ({ tour }) => {
       ? image[0]
       : `${process.env.REACT_APP_API_URL}/images/${image[0]}`;
   });
+
+  const minAvailableSeats = useMemo(() => {
+    if (!schedules || schedules.length === 0) return 0;
+    return Math.min(...schedules.map((schedule) => schedule.availableSeats));
+  }, [schedules]);
 
   const handleImageError = () => {
     console.error("Image failed to load:", imgSrc);
@@ -29,36 +43,42 @@ const TourCard = ({ tour }) => {
       </Card>
 
       <CardBody>
-        <div className="tour__rating">
+        <div className="tour-rating">
           <span className="rating__number">
             {tour?.ratingStats?.averageRating?.toFixed(1)}{" "}
             <i className="ri-star-fill"></i>
           </span>
           <span>({tour?.ratingStats?.numberOfReviews} reviews)</span>
         </div>
-        <h3 className="tour__title">
+        <h5 className="tour__title" title={name}>
           <Link to={`/tours/${_id}`}>{name}</Link>
-        </h3>
+        </h5>
         <div className="card__top d-flex justify-content-between">
-          <span className="tour__startlocation d-flex  gap-1">
+          <span className="tour__startlocation d-flex gap-1">
             <i className="ri-map-pin-line"></i>
             Start Location: {startLocation}
           </span>
 
-          <span className="tour__location d-flex  gap-1">
+          <span className="tour__location d-flex gap-1">
             <i className="ri-map-pin-line"></i>
             Location: {location}
           </span>
 
-          <span className="tour__time d-flex  gap-1">
+          <span className="tour__time d-flex gap-1">
             <i className="ri-time-line"></i> Time: {time}
+          </span>
+          <span className="available-seats">
+            <i className="ri-user-line"></i> Only <span style={{ color: 'red' }}>{minAvailableSeats}</span> seats left
           </span>
         </div>
 
         <div className="card__bottom d-flex align-items-center justify-content-between mt-3">
-          <h5>
-            ${price} <span>/per person</span>
-          </h5>
+          <div className="tour__price">
+            <h5>
+              ${price} <span>/per person</span>
+            </h5>
+          </div>
+
           <div className="tour__info d-flex align-items-center gap-3">
             <button className="btn booking__btn">
               <Link to={`/tours/${_id}/booking`}>Book Now</Link>

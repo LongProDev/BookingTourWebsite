@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', reviewController.getAllReviews);
+router.get('/tour/:tourId', reviewController.getReviewsByTourId);
 
 // Protected routes
 router.use(authenticateToken);

@@ -60,6 +60,7 @@ const AdminReviews = () => {
       <Table responsive>
         <thead>
           <tr>
+            <th>No.</th>
             <th>User</th>
             <th>Tour</th>
             <th>Rating</th>
@@ -69,8 +70,9 @@ const AdminReviews = () => {
           </tr>
         </thead>
         <tbody>
-          {reviews.map((review) => (
+          {reviews.map((review, index) => (
             <tr key={review._id}>
+              <td>{index + 1}</td>
               <td>{review.userId?.username || 'Unknown User'}</td>
               <td>{review.tourId?.name || 'Unknown Tour'}</td>
               <td>

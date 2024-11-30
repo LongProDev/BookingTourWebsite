@@ -17,7 +17,7 @@
 .admin-tours .table th {
   background-color: #f1f1f1;
   color: #333;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .admin-tours .modal-content {
@@ -97,13 +97,9 @@
   word-wrap: break-word;
   text-align: center;
 } 
-.admin-tours table td:nth-child(2) {
-  word-wrap: break-word;
-  text-align: center;
-} 
 .admin-tours table td:nth-child(3) {
   word-wrap: break-word;
-  text-align: center;
+  text-align: left;
 } 
 .admin-tours table td:nth-child(4) {
   word-wrap: break-word;
@@ -117,3 +113,50 @@
   word-wrap: break-word;
   text-align: center;
 } 
+.admin-tours table td:nth-child(7) {
+  word-wrap: break-word;
+  text-align: left;
+} 
+
+.search-filters {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-filters .form-group {
+  margin-bottom: 0;
+}
+
+.search-filters label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.search-filters input {
+  font-size: 14px;
+}
+
+.search-filters input:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 0.2rem rgba(250, 169, 53, 0.25);
+}
+
+.pagination {
+  margin-top: 2rem;
+}
+
+.page-item.active .page-link {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+}
+
+.page-link {
+  color: var(--secondary-color);
+}
+
+.page-link:hover {
+  color: var(--primary-color);
+}

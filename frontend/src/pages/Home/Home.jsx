@@ -13,7 +13,6 @@ import SearchBar from "../../shared/SearchBar";
 
 import FeaturedTourList from "../../components/Featured-tours/FeaturedTourList";
 import MasonryImagesGallery from "../../components/Images-gallery/MasonryImagesGallery";
-import Testimonials from "../../components/Tesimonial/Testimonials";
 import Newsletter from "../../shared/Newsletter";
 
 const Home = () => {
@@ -132,20 +131,6 @@ const Home = () => {
             </Col>
             <Col lg="12">
               <MasonryImagesGallery />
-            </Col>
-          </Row>
-        </Container>
-      </section>
-
-      <section>
-        <Container>
-          <Row>
-            <Col lg="12">
-              <Subtitle subtitle={"Fans Love"}></Subtitle>
-              <h2 className="testimonial__title">What our customers say about us</h2>
-            </Col>
-            <Col lg="12">
-              <Testimonials />
             </Col>
           </Row>
         </Container>

@@ -69,7 +69,7 @@ const TourController = {
       // Validate required fields
       const requiredFields = [
         'name', 'description', 'price', 'time', 
-        'location', 'maxPeople', 'startLocation'
+        'location', 'startLocation'
       ];
       
       const missingFields = requiredFields.filter(field => !req.body[field]);
@@ -95,7 +95,6 @@ const TourController = {
         price: parseFloat(req.body.price) || 0,
         time: req.body.time,
         location: req.body.location,
-        maxPeople: parseInt(req.body.maxPeople) || 0,
         startLocation: req.body.startLocation,
         featured: req.body.featured === 'true',
         image: req.files.map(file => file.originalname),
@@ -155,7 +154,6 @@ const TourController = {
       
       // Handle numeric fields
       if (updateData.price) updateData.price = parseFloat(updateData.price);
-      if (updateData.maxPeople) updateData.maxPeople = parseInt(updateData.maxPeople);
       if (updateData.featured) updateData.featured = updateData.featured === 'true';
 
       // Handle schedules
@@ -179,10 +177,23 @@ const TourController = {
 
       // Handle new images if uploaded
       if (req.files && req.files.length > 0) {
-        updateData.image = req.files.map(file => file.originalname);
+        // Get the existing tour to handle image cleanup
+        const existingTour = await Tour.findById(req.params.id);
+        if (existingTour && existingTour.image) {
+          // Delete old images
+          existingTour.image.forEach(filename => {
+            if (!filename.startsWith('http')) {
+              const filePath = path.join(process.cwd(), 'public', 'images', filename);
+              fs.unlink(filePath, err => {
+                if (err) console.error('Error deleting old file:', err);
+              });
+            }
+          });
+        }
+        // Update with new images
+        updateData.image = req.files.map(file => file.filename);
       }
 
-      console.log('Schedules before update:', updateData.schedules);
       const tour = await Tour.findByIdAndUpdate(
         req.params.id,
         { $set: updateData },
@@ -190,14 +201,7 @@ const TourController = {
           new: true,
           runValidators: true
         }
-      ).catch(error => {
-        console.error('MongoDB Update Error:', {
-          name: error.name,
-          message: error.message,
-          errors: error.errors
-        });
-        throw error;
-      });
+      );
 
       if (!tour) {
         return res.status(404).json({

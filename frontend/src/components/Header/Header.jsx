@@ -4,7 +4,6 @@ import { NavLink, Link} from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import { AuthContext } from "../../context/AuthContext";
 import "./header.css";
-import ToursDropdown from './ToursDropdown';
 import UserDropdown from './UserDropdown';
 
 const Header = () => {
@@ -76,7 +75,6 @@ const Header = () => {
                     <NavLink to={item.path} onClick={toggleMenu}>
                       {item.display}
                     </NavLink>
-                    {item.path === "/tours" && <ToursDropdown />}
                   </li>
                 ))}
               </ul>

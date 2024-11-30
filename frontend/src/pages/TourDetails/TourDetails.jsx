@@ -6,7 +6,6 @@ import {
   Col,
   Carousel,
   CarouselItem,
-  CarouselControl,
   CarouselIndicators,
   Button,
   Form,
@@ -54,9 +53,12 @@ const TourDetails = () => {
 
   const fetchReviews = async () => {
     try {
+      console.log("Fetching reviews for tour ID:", id);
       const response = await tourService.getReviews(id);
+      console.log("Reviews response:", response);
       if (response && response.data) {
         setReviews(response.data);
+        console.log("Reviews set to state:", response.data);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -110,17 +112,22 @@ const TourDetails = () => {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("Submitting review:", { tourId: id, ...review });
       const response = await tourService.createReview({
         tourId: id,
         rating: review.rating,
         comment: review.comment,
       });
+      console.log("Review submission response:", response);
 
       if (response.success) {
         setShowThankYouModal(true);
         setReview({ rating: 5, comment: "" });
+        // Refresh reviews data
+        await fetchReviews();
         // Refresh tour data to update ratings
-        fetchTour();
+        await fetchTour();
+        console.log("Reviews refreshed after submission");
       }
     } catch (error) {
       console.error("Error submitting review:", error);
@@ -139,67 +146,98 @@ const TourDetails = () => {
       <img
         src={img}
         alt={`${tour.name} - View ${index + 1}`}
-        className="w-100"
-        style={{ height: "400px", objectFit: "cover" }}
+        className="carousel-image"
         onError={handleImageError}
       />
     </CarouselItem>
   ));
 
   const reviewSection = (
-    <div className="tour-reviews mt-5">
-      <h5>Reviews</h5>
+    <div className="tour-reviews">
+      <div className="reviews-section">
+        <div className="reviews-header">
+          <h4>Customer Reviews ({reviews.length})</h4>
+        </div>
 
-      <Form onSubmit={handleReviewSubmit} className="review-form mb-4">
-        <FormGroup>
-          <Label for="rating">Rating</Label>
-          <Input
-            type="select"
-            name="rating"
-            id="rating"
-            value={review.rating}
-            onChange={(e) =>
-              setReview({ ...review, rating: parseInt(e.target.value) })
-            }
-          >
-            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-            <option value="4">⭐⭐⭐⭐ (4)</option>
-            <option value="3">⭐⭐⭐ (3)</option>
-            <option value="2">⭐⭐ (2)</option>
-            <option value="1">⭐ (1)</option>
-          </Input>
-        </FormGroup>
-
-        <FormGroup>
-          <Label for="comment">Your Review</Label>
-          <Input
-            type="textarea"
-            name="comment"
-            id="comment"
-            value={review.comment}
-            onChange={(e) => setReview({ ...review, comment: e.target.value })}
-            placeholder="Share your experience..."
-            rows="4"
-          />
-        </FormGroup>
-
-        <Button color="primary" type="submit">
-          Submit Review
-        </Button>
-      </Form>
-
-      <div className="reviews-list">
-        {reviews.map((review, index) => (
-          <div key={index} className="review-item p-3 mb-2 bg-light rounded">
-            <div className="d-flex justify-content-between">
-              <div>{"⭐".repeat(review.rating)}</div>
-              <small className="text-muted">
-                {new Date(review.createdAt).toLocaleDateString()}
-              </small>
-            </div>
-            <p className="mb-0 mt-2">{review.comment}</p>
+        {reviews && reviews.length > 0 ? (
+          <div className="reviews-list">
+            {reviews.map((review, index) => (
+              <div key={index} className="review-item">
+                <div className="review-header">
+                  <div className="reviewer-info">
+                    <div className="reviewer-avatar">
+                      {review.userName ? review.userName.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div>
+                      <div className="reviewer-name">
+                        {review.userName || 'Anonymous User'}
+                      </div>
+                      <div className="review-date">
+                        {new Date(review.createdAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="review-rating">
+                    {"⭐".repeat(review.rating)}
+                  </div>
+                </div>
+                <div className="review-content">
+                  {review.comment}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="no-reviews">
+            <i className="ri-chat-3-line mb-2" style={{ fontSize: '1.5rem' }}></i>
+            <p>No reviews yet. Be the first to review this tour!</p>
+          </div>
+        )}
+      </div>
+
+      <div className="write-review-section mt-3">
+        <h5>Write a Review</h5>
+        <Form onSubmit={handleReviewSubmit} className="review-form">
+          <FormGroup className="mb-2">
+            <Label for="rating" className="mb-1">Rating</Label>
+            <Input
+              type="select"
+              name="rating"
+              id="rating"
+              value={review.rating}
+              onChange={(e) =>
+                setReview({ ...review, rating: parseInt(e.target.value) })
+              }
+            >
+              <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+              <option value="4">⭐⭐⭐⭐ (4)</option>
+              <option value="3">⭐⭐⭐ (3)</option>
+              <option value="2">⭐⭐ (2)</option>
+              <option value="1">⭐ (1)</option>
+            </Input>
+          </FormGroup>
+
+          <FormGroup className="mb-2">
+            <Label for="comment" className="mb-1">Your Review</Label>
+            <Input
+              type="textarea"
+              name="comment"
+              id="comment"
+              value={review.comment}
+              onChange={(e) => setReview({ ...review, comment: e.target.value })}
+              placeholder="Share your experience..."
+              rows="3"
+            />
+          </FormGroup>
+
+          <Button color="primary" type="submit" size="sm">
+            Submit Review
+          </Button>
+        </Form>
       </div>
     </div>
   );
@@ -211,44 +249,26 @@ const TourDetails = () => {
           <Row>
             <Col lg="8">
               <div className="tour-content">
-                <div className="tour-images mb-4">
+                <div className="tour-images-container">
                   <Carousel
                     activeIndex={activeIndex}
                     next={next}
                     previous={previous}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
+                    className="tour-carousel"
                   >
                     <CarouselIndicators
                       items={tour.image}
                       activeIndex={activeIndex}
                       onClickHandler={goToIndex}
+                      className="carousel-indicators"
                     />
                     {slides}
-                    <CarouselControl
-                      className="carousel-control-prev"
-                      direction="prev"
-                      directionText="Previous"
-                      onClickHandler={previous}
-                    />
-                    <CarouselControl
-                      className="carousel-control-next"
-                      direction="next"
-                      directionText="Next"
-                      onClickHandler={next}
-                    />
                   </Carousel>
                 </div>
 
-                <div className="tour-info">
-                  <div className="tour__rating d-flex align-items-center gap-3">
-                    <span className="rating__number">
-                      {tour?.ratingStats?.averageRating?.toFixed(1)}{" "}
-                      <i className="ri-star-fill"></i>
-                    </span>
-                    <span>({tour?.ratingStats?.numberOfReviews} reviews)</span>
-                  </div>
-
+                <div className="tour-info mt-4">
                   <h2>{tour.name}</h2>
                   <h5>Description</h5>
                   <div dangerouslySetInnerHTML={{ __html: tour.description }} />
@@ -279,12 +299,12 @@ const TourDetails = () => {
                                 at {schedule.returnTime}
                               </span>
                               <span>
-                                <i className="ri-user-line"></i> Available
-                                Seats: {schedule.availableSeats}
+                                <i className="ri-bus-line"></i> Transportation:{" "}
+                                {schedule.transportation}
                               </span>
                               <span>
-                                <i className="ri-money-dollar-circle-line"></i>{" "}
-                                Price: ${schedule.price}
+                                <i className="ri-user-line"></i> Available
+                                Seats: {schedule.availableSeats}
                               </span>
                             </div>
                           </div>
@@ -311,12 +331,8 @@ const TourDetails = () => {
                   <span>Destination: {tour.location}</span>
                 </div>
                 <div className="summary-item">
-                  <i className="ri-group-line"></i>
-                  <span>Group Size: {tour.maxPeople} people</span>
-                </div>
-                <div className="summary-item">
                   <i className="ri-time-line"></i>
-                  <span>Duration: {tour.time}</span>
+                  <span>Itinerary: {tour.time}</span>
                 </div>
                 <div className="summary-price">
                   <h4>${tour.price}</h4>

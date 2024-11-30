@@ -7,7 +7,6 @@ const scheduleSchema = new mongoose.Schema({
   returnTime: { type: String, required: true },
   transportation: { type: String, required: true },
   availableSeats: { type: Number, required: true, min: 0 },
-  price: { type: Number, required: true, min: 0 }
 });
 
 const tourSchema = new mongoose.Schema({
@@ -17,7 +16,6 @@ const tourSchema = new mongoose.Schema({
   image: [{ type: String, required: true }],
   time: { type: String, required: true },
   location: { type: String, required: true },
-  maxPeople: { type: Number, required: true },
   startLocation: { type: String, required: true },
   featured: { type: Boolean, default: false },
   schedules: [scheduleSchema],

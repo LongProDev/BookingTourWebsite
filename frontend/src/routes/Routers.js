@@ -20,6 +20,7 @@ import PaymentConfirmation from '../pages/Payment/PaymentConfirmation';
 import PaymentGateway from "../pages/Payment/PaymentGateway.jsx";
 import PaymentSuccess from "../pages/Payment/PaymentSuccess.jsx";
 import BookingSuccess from "../pages/Booking/BookingSuccess.jsx";
+import AdminReviews from "../components/Admin/AdminReviews/Reviews.jsx";
 
 
 const Routers = () => {
@@ -39,6 +40,7 @@ const Routers = () => {
         <Route path="tours" element={<AdminTours />} />
         <Route path="bookings" element={<AdminBookings />} />
         <Route path="users" element={<AdminUsers />} />
+        <Route path="reviews" element={<AdminReviews />} />
         <Route path="statistics" element={<AdminStatistics />} />
       </Route>
 

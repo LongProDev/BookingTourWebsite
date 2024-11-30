@@ -58,6 +58,22 @@ const reviewController = {
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
+  },
+
+  getReviewsByTourId: async (req, res) => {
+    try {
+      const { tourId } = req.params;
+      const reviews = await Review.find({ tourId })
+        .populate('userId', 'username')
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        data: reviews
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
   }
 };
 

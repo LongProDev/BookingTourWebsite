@@ -127,6 +127,7 @@ const ScheduleModal = ({
               <option value="">Select Transportation</option>
               <option value="Airplane">Airplane</option>
               <option value="Train">Train</option>
+              <option value="Bus">Bus</option>
             </Input>
           </FormGroup>
 
@@ -140,23 +141,6 @@ const ScheduleModal = ({
                 setScheduleData({
                   ...scheduleData,
                   availableSeats: e.target.value,
-                })
-              }
-              required
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Price ($)</Label>
-            <Input
-              type="number"
-              min="0"
-              step="0.01"
-              value={scheduleData.price}
-              onChange={(e) =>
-                setScheduleData({
-                  ...scheduleData,
-                  price: e.target.value,
                 })
               }
               required
@@ -179,6 +163,12 @@ const ScheduleModal = ({
 
 const AdminTours = () => {
   const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pageCount, setPageCount] = useState(0);
+  const [page, setPage] = useState(0);
+  const TOURS_PER_PAGE = 8;
+  
   const [modal, setModal] = useState(false);
   const [currentTour, setCurrentTour] = useState(null);
   const [formData, setFormData] = useState({
@@ -187,7 +177,6 @@ const AdminTours = () => {
     price: "0",
     time: "",
     location: "",
-    maxPeople: "0",
     startLocation: "",
     featured: false,
     schedules: [],
@@ -201,7 +190,6 @@ const AdminTours = () => {
     returnTime: "",
     transportation: "",
     availableSeats: "",
-    price: "",
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -209,29 +197,38 @@ const AdminTours = () => {
 
   const [editScheduleId, setEditScheduleId] = useState(null);
 
-  useEffect(() => {
-    fetchTours();
-  }, []);
+  const [searchFilters, setSearchFilters] = useState({
+    name: '',
+    location: '',
+    price: ''
+  });
 
   const fetchTours = async () => {
     try {
-      const response = await tourService.getAllTours();
+      setLoading(true);
+      const response = await tourService.getAllTours(page, TOURS_PER_PAGE);
       if (response.success) {
         setTours(response.data);
+        // Calculate total pages
+        const total = response.totalTours || 0;
+        setPageCount(Math.ceil(total / TOURS_PER_PAGE));
       }
-    } catch (error) {
-      console.error("Error fetching tours:", error);
-      if (error.message.includes("authentication")) {
-        window.location.href = "/login";
-      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchTours();
+  }, [page]); // Refetch when page changes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       // Validate required fields
-      const requiredFields = ['name', 'description', 'price', 'time', 'location', 'maxPeople', 'startLocation'];
+      const requiredFields = ['name', 'description', 'price', 'time', 'location', 'startLocation'];
       const missingFields = requiredFields.filter(field => !formData[field]);
       
       if (missingFields.length > 0) {
@@ -248,7 +245,7 @@ const AdminTours = () => {
       Object.keys(formData).forEach((key) => {
         if (key === 'schedules') {
           formDataToSend.append(key, JSON.stringify(formData[key] || []));
-        } else if (key === 'price' || key === 'maxPeople') {
+        } else if (key === 'price') {
           const value = parseFloat(formData[key]) || 0;
           formDataToSend.append(key, value);
         } else if (key === 'featured') {
@@ -285,7 +282,6 @@ const AdminTours = () => {
       price: "0",
       time: "",
       location: "",
-      maxPeople: "0",
       startLocation: "",
       featured: false,
       schedules: [],
@@ -316,7 +312,7 @@ const AdminTours = () => {
       console.log('Schedule Data:', scheduleData);
       
       // Validate all required fields
-      const requiredFields = ['departureDate', 'departureTime', 'returnDate', 'returnTime', 'transportation', 'availableSeats', 'price'];
+      const requiredFields = ['departureDate', 'departureTime', 'returnDate', 'returnTime', 'transportation', 'availableSeats'];
       const missingFields = requiredFields.filter(field => !scheduleData[field]);
       
       if (missingFields.length > 0) {
@@ -332,11 +328,6 @@ const AdminTours = () => {
       if (isNaN(scheduleData.availableSeats) || parseInt(scheduleData.availableSeats) < 1) {
         console.error('Invalid available seats:', scheduleData.availableSeats);
         throw new Error('Available seats must be a positive number');
-      }
-
-      if (isNaN(scheduleData.price) || parseFloat(scheduleData.price) < 0) {
-        console.error('Invalid price:', scheduleData.price);
-        throw new Error('Price must be a non-negative number');
       }
 
       // Format and validate dates with logging
@@ -372,7 +363,6 @@ const AdminTours = () => {
         returnDate: returnDateTime.toISOString(),
         transportation: scheduleData.transportation,
         availableSeats: parseInt(scheduleData.availableSeats),
-        price: parseFloat(scheduleData.price)
       };
       console.log('New Schedule Object:', newSchedule);
 
@@ -407,7 +397,6 @@ const AdminTours = () => {
           returnTime: "",
           transportation: "",
           availableSeats: "",
-          price: "",
         });
       } else {
         console.error('API Error:', response);
@@ -438,9 +427,6 @@ const AdminTours = () => {
               <br />⏰ Return Time: {schedule.returnTime}
               <br />
               💺 Available Seats: {schedule.availableSeats}
-              <br />
-              💰 Price: ${schedule.price}
-              <br />
               <Button
                 color="info"
                 size="sm"
@@ -508,10 +494,74 @@ const AdminTours = () => {
       returnTime: schedule.returnTime,
       transportation: schedule.transportation,
       availableSeats: schedule.availableSeats,
-      price: schedule.price
     });
     setScheduleModal(true);
   };
+
+  const getFilteredTours = () => {
+    return tours.filter(tour => {
+      const nameMatch = tour.name.toLowerCase().includes(searchFilters.name.toLowerCase());
+      const locationMatch = tour.location.toLowerCase().includes(searchFilters.location.toLowerCase());
+      const priceMatch = !searchFilters.price || tour.price <= parseFloat(searchFilters.price);
+      
+      return nameMatch && locationMatch && priceMatch;
+    });
+  };
+
+  const handleSearchChange = (e) => {
+    const { name, value } = e.target;
+    setSearchFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setPage(0); // Reset to first page when searching
+  };
+
+  const searchSection = (
+    <div className="search-filters mb-4">
+      <Row>
+        <Col md={4}>
+          <FormGroup>
+            <Label for="name">Tour Name</Label>
+            <Input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Search by name..."
+              value={searchFilters.name}
+              onChange={handleSearchChange}
+            />
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label for="location">Location</Label>
+            <Input
+              type="text"
+              name="location"
+              id="location"
+              placeholder="Search by location..."
+              value={searchFilters.location}
+              onChange={handleSearchChange}
+            />
+          </FormGroup>
+        </Col>
+        <Col md={4}>
+          <FormGroup>
+            <Label for="price">Price</Label>
+            <Input
+              type="number"
+              name="price"
+              id="price"
+              placeholder="Enter max price..."
+              value={searchFilters.price}
+              onChange={handleSearchChange}
+            />
+          </FormGroup>
+        </Col>
+      </Row>
+    </div>
+  );
 
   return (
     <div className="admin-tours">
@@ -522,105 +572,125 @@ const AdminTours = () => {
         </Button>
       </div>
 
-      <Table responsive hover>
-        <thead>
-          <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Location</th>
-            <th>Duration</th>
-            <th>Price</th>
-            <th>Max People</th>
-            <th>Description</th>
-            <th>Featured</th>
-            <th>Schedules</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tours.map((tour) => (
-            <tr key={tour._id}>
-              <td>
-                {tour.image && tour.image.length > 0 ? (
-                  <img
-                    src={getImageUrl(tour.image[0])}
-                    alt={tour.name}
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <img
-                    src="/placeholder.jpg"
-                    alt="Tour placeholder"
-                    style={{
-                      width: "100px",
-                      height: "100px",
-                      objectFit: "cover",
-                    }}
-                  />
-                )}
-              </td>
-              <td>{tour.name}</td>
-              <td>{tour.location}</td>
-              <td>{tour.time}</td>
-              <td>${tour.price}</td>
-              <td>{tour.maxPeople}</td>
-              <td>{tour.description}</td>
-              <td>{tour.featured ? "Yes" : "No"}</td>
-              <td>{formatSchedules(tour.schedules)}</td>
-              <td>
-                <Button
-                  color="info"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    setCurrentTour(tour);
-                    setFormData(tour);
-                    setModal(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  color="danger"
-                  size="sm"
-                  onClick={() => handleDelete(tour._id)}
-                >
-                  Delete
-                </Button>
-                <Button
-                  color="success"
-                  size="sm"
-                  className="me-2"
-                  onClick={() => {
-                    if (!tour) {
-                      alert('Error: Tour data is missing');
-                      return;
-                    }
-                    setCurrentTour(tour);
-                    setEditScheduleId(null);
-                    setScheduleData({
-                      departureDate: "",
-                      departureTime: "",
-                      returnDate: "",
-                      returnTime: "",
-                      transportation: "",
-                      availableSeats: "",
-                      price: "",
-                    });
-                    setScheduleModal(true);
-                  }}
-                >
-                  Add Schedule
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      {searchSection}
+
+      {loading && <div className="text-center">Loading...</div>}
+      {error && <div className="text-center text-danger">{error}</div>}
+      
+      {!loading && !error && (
+        <>
+          <Table responsive hover>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Itinerary</th>
+                <th>Price</th>
+                <th>Description</th>
+                <th>Featured</th>
+                <th>Schedules</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getFilteredTours().map((tour, index) => (
+                <tr key={tour._id}>
+                  <td>{page * TOURS_PER_PAGE + index + 1}</td>
+                  <td>
+                    {tour.image && tour.image.length > 0 ? (
+                      <img
+                        src={getImageUrl(tour.image[0])}
+                        alt={tour.name}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src="/placeholder.jpg"
+                        alt="Tour placeholder"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
+                  </td>
+                  <td>{tour.name}</td>
+                  <td>{tour.location}</td>
+                  <td>{tour.time}</td>
+                  <td>${tour.price}</td>
+                  <td>{tour.description}</td>
+                  <td>{tour.featured ? "Yes" : "No"}</td>
+                  <td>{formatSchedules(tour.schedules)}</td>
+                  <td>
+                    <Button
+                      color="info"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => {
+                        setCurrentTour(tour);
+                        setFormData(tour);
+                        setModal(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      color="danger"
+                      size="sm"
+                      onClick={() => handleDelete(tour._id)}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      color="success"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => {
+                        if (!tour) {
+                          alert('Error: Tour data is missing');
+                          return;
+                        }
+                        setCurrentTour(tour);
+                        setEditScheduleId(null);
+                        setScheduleData({
+                          departureDate: "",
+                          departureTime: "",
+                          returnDate: "",
+                          returnTime: "",
+                          transportation: "",
+                          availableSeats: "",
+                        });
+                        setScheduleModal(true);
+                      }}
+                    >
+                      Add Schedule
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+          <div className="pagination d-flex align-items-center justify-content-center mt-4 gap-3">
+            {[...Array(pageCount).keys()].map((number) => (
+              <span
+                key={number}
+                onClick={() => setPage(number)}
+                className={page === number ? "active__page" : ""}
+              >
+                {number + 1}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
 
       <Modal isOpen={modal} toggle={() => setModal(false)} size="lg">
         <ModalHeader toggle={() => setModal(false)}>
@@ -727,27 +797,12 @@ const AdminTours = () => {
                   />
                 </FormGroup>
               </Col>
-              <Col md={6}>
-                <FormGroup>
-                  <Label for="maxPeople">Max People</Label>
-                  <Input
-                    type="number"
-                    name="maxPeople"
-                    value={formData.maxPeople}
-                    onChange={(e) =>
-                      setFormData({ ...formData, maxPeople: e.target.value })
-                    }
-                    min="1"
-                    required
-                  />
-                </FormGroup>
-              </Col>
             </Row>
 
             <Row>
               <Col md={6}>
                 <FormGroup>
-                  <Label for="time">Duration</Label>
+                  <Label for="time">Itinerary</Label>
                   <Input
                     type="text"
                     name="time"
