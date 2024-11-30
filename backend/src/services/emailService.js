@@ -60,3 +60,31 @@ export const sendBookingConfirmationEmail = async (booking) => {
     throw error;
   }
 };
+
+export const sendPasswordResetEmail = async ({ email, username, tempPassword }) => {
+  try {
+    const mailOptions = {
+      from: '"Tour Booking" <thanhlongn08@gmail.com>',
+      to: email,
+      subject: "Password Reset Request",
+      html: `
+        <h1>Password Reset</h1>
+        <p>Dear ${username},</p>
+        <p>You have requested to reset your password.</p>
+        <p>Here is your temporary password: <strong>${tempPassword}</strong></p>
+        <p>Please use this temporary password to log in and then change your password immediately for security purposes.</p>
+        <p>If you did not request this password reset, please contact us immediately.</p>
+        <br>
+        <p>Best regards,</p>
+        <p>Tour Booking Team</p>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Password reset email sent successfully:", info.messageId);
+    return info;
+  } catch (error) {
+    console.error("Email sending error:", error);
+    throw error;
+  }
+};

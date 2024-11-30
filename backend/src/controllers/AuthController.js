@@ -1,5 +1,7 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import { sendPasswordResetEmail } from "../services/emailService.js";
+import crypto from 'crypto';
 
 const authController = {
   register: async (req, res) => {
@@ -125,6 +127,45 @@ const authController = {
       res.status(500).json({
         success: false,
         message: error.message
+      });
+    }
+  },
+
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ email });
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "No user found with this email address"
+        });
+      }
+
+      // Generate temporary password
+      const tempPassword = Math.random().toString(36).slice(-8) + 'A1'; // Ensures it meets password requirements
+
+      // Update user's password
+      user.password = tempPassword;
+      await user.save();
+
+      // Send email with temporary password
+      await sendPasswordResetEmail({
+        email: user.email,
+        username: user.username,
+        tempPassword: tempPassword
+      });
+
+      res.status(200).json({
+        success: true,
+        message: "Password reset instructions have been sent to your email"
+      });
+    } catch (error) {
+      console.error('Password reset error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to process password reset"
       });
     }
   }

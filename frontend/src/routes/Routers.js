@@ -21,6 +21,7 @@ import PaymentGateway from "../pages/Payment/PaymentGateway.jsx";
 import PaymentSuccess from "../pages/Payment/PaymentSuccess.jsx";
 import BookingSuccess from "../pages/Booking/BookingSuccess.jsx";
 import AdminReviews from "../components/Admin/AdminReviews/Reviews.jsx";
+import ForgotPassword from "../components/ForgotPassword/ForgotPassword.jsx";
 
 
 const Routers = () => {
@@ -34,6 +35,7 @@ const Routers = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/account" element={<ProtectedRoute noAdmin><Account /></ProtectedRoute>} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
 
       <Route path="/admin" element={<AdminLayout />}>

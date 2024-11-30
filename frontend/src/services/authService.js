@@ -40,6 +40,15 @@ const authService = {
 
   getToken: () => {
     return localStorage.getItem('token');
+  },
+
+  forgotPassword: async (email) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to process request');
+    }
   }
 };
 
