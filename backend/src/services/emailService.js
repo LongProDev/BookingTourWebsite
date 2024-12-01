@@ -48,7 +48,7 @@ export const sendBookingConfirmationEmail = async (booking) => {
           <li>Children: ${booking.numberOfChildren}</li>
           <li>Total Amount: $${booking.totalPrice}</li>
         </ul>
-        <p>If you have any questions, please contact us via email: traveleasy@gmail.com or hotline: 098386868686</p>
+        <p>If you have any questions, please contact us via email: traveleasy@gmail.com or hotline: 09196968386</p>
       `,
     };
 

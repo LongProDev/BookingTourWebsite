@@ -53,7 +53,7 @@ const About = () => {
                     <i className="ri-phone-line"></i>
                     <div>
                       <h5>Phone</h5>
-                      <p>+84 983868686</p>
+                      <p>+84 9196968386</p>
                     </div>
                   </div>
 
