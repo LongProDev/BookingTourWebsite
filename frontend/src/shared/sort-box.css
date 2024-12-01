@@ -1,0 +1,67 @@
+.sort-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  max-width: fit-content;
+  margin: 0 auto 1rem;
+  margin-right: 7rem;
+}
+
+.sort-label {
+  margin-right: 1rem;
+  color: var(--heading-color);
+  font-weight: 500;
+}
+
+.sort-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+  background-color: #fff;
+  min-width: 200px;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 2px rgba(250, 169, 53, 0.2);
+}
+
+.sort-select option {
+  padding: 0.5rem;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .sort-box {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.8rem;
+  }
+
+  .sort-label {
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .sort-select {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .sort-box {
+    padding: 0.6rem;
+  }
+
+  .sort-select {
+    font-size: 0.85rem;
+  }
+} 

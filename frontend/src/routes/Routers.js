@@ -24,6 +24,7 @@ import AdminReviews from "../components/Admin/AdminReviews/Reviews.jsx";
 import ForgotPassword from "../components/ForgotPassword/ForgotPassword.jsx";
 import BookingHistory from "../components/BookingHistory/BookingHistory.jsx";
 import About from "../pages/About/About.jsx";
+import AdminCustomers from "../components/Admin/AdminCustomers/AdminCustomers.jsx";
 
 
 const Routers = () => {
@@ -48,6 +49,7 @@ const Routers = () => {
         <Route path="users" element={<AdminUsers />} />
         <Route path="reviews" element={<AdminReviews />} />
         <Route path="statistics" element={<AdminStatistics />} />
+        <Route path="customers" element={<AdminCustomers />} />
       </Route>
 
       <Route path="/tours/:id/booking" element={<Booking />} />

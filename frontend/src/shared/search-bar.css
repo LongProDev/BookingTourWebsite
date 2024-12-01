@@ -2,7 +2,7 @@
     padding: 0.5rem 1rem;
     border-radius: 50px;
     box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
-    width: 100%;
+    width: max(300px, 90%);
     max-width: 1000px;
     margin: 50px auto 0;
     background-color: #fff;
@@ -10,6 +10,9 @@
   
   .form__group {
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   
   .form__group span {
@@ -22,6 +25,7 @@
     font-size: 0.9rem;
     color: var(--heading-color);
     font-weight: 500;
+    width: 100%;
   }
   
   .form__group input:focus {
@@ -30,10 +34,12 @@
   
   .form__group h6 {
     margin-bottom: 0;
+    white-space: nowrap;
   }
   
   .form__group-fast {
     border-right: 2px solid #ddd;
+    padding-right: 1rem;
   }
   
   .search__icon {
@@ -43,53 +49,87 @@
     color: #fff;
     border-radius: 10px;
     cursor: pointer;
+    transition: all 0.3s;
   }
   
-  @media (max-width: 992px) {
+  .search__icon:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+  }
+  
+  /* Tablet Styles */
+  @media screen and (max-width: 992px) {
     .search_bar {
-      width: 100%;
-      margin-top: 150px;
+      margin-top: 30px;
+      padding: 0.8rem;
+      flex-direction: column;
     }
     
     .form__group {
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
     }
     
     .form__group-fast {
       border-right: none;
       border-bottom: 1px solid #ddd;
-      padding-bottom: 1rem;
+      padding-bottom: 0.8rem;
+      padding-right: 0;
     }
   }
   
-  @media (max-width: 768px) {
+  /* Mobile Landscape Styles */
+  @media screen and (max-width: 768px) {
     .search_bar {
-      padding: 1rem;
+      border-radius: 25px;
+      padding: 0.6rem;
     }
     
     .form__group span {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
     }
     
     .form__group input {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+    }
+    
+    .form__group h6 {
+      font-size: 0.9rem;
+    }
+    
+    .search__icon {
+      font-size: 1.4rem;
+      padding: 0.4rem;
     }
   }
   
-  @media (max-width: 576px) {
+  /* Mobile Portrait Styles */
+  @media screen and (max-width: 576px) {
     .search_bar {
+      width: 95%;
+      margin-top: 20px;
       border-radius: 20px;
-      margin-top: 200px;
     }
     
     .form__group {
       flex-direction: column;
       align-items: flex-start;
+      gap: 0.4rem;
+    }
+    
+    .form__group input {
+      width: 100%;
+      padding: 0.5rem 0;
     }
     
     .search__icon {
       width: 100%;
       text-align: center;
-      border-radius: 20px;
+      border-radius: 15px;
+      margin-top: 0.5rem;
+    }
+    
+    .form__group-fast {
+      padding-bottom: 0.6rem;
+      margin-bottom: 0.6rem;
     }
   }

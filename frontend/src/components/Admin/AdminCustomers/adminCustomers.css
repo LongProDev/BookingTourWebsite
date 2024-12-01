@@ -1,0 +1,74 @@
+.admin-customers {
+  max-width: 100%;
+  padding: 20px;
+  font-size: 14px;
+}
+
+.admin-customers table {
+  width: 100%;
+  table-layout: fixed;
+  margin-top: 20px;
+}
+
+.admin-customers th, 
+.admin-customers td {
+  padding: 12px;
+  vertical-align: middle;
+  word-wrap: break-word;
+}
+
+/* Column width distributions */
+.admin-customers th:nth-child(1),
+.admin-customers td:nth-child(1) {
+  width: 20%;
+}
+
+.admin-customers th:nth-child(2),
+.admin-customers td:nth-child(2) {
+  width: 20%;
+}
+
+.admin-customers th:nth-child(3),
+.admin-customers td:nth-child(3) {
+  width: 15%;
+}
+
+.admin-customers th:nth-child(4),
+.admin-customers td:nth-child(4) {
+  width: 15%;
+}
+
+.admin-customers th:nth-child(5),
+.admin-customers td:nth-child(5) {
+  width: 15%;
+}
+
+.admin-customers th:nth-child(6),
+.admin-customers td:nth-child(6) {
+  width: 15%;
+}
+
+.search-filters {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.search-filters .form-group {
+  margin-bottom: 0;
+}
+
+.search-filters label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.search-filters input {
+  font-size: 14px;
+}
+
+.admin-customers h2 {
+  margin-bottom: 20px;
+  color: var(--heading-color);
+} 

@@ -1,6 +1,9 @@
 .tour__page {
-  padding-top: 70px;
-  padding-bottom: 50px;
+  padding: 50px 0;
+}
+
+.tour__search-container {
+  margin-bottom: 40px;
 }
 
 .tour__page .pagination {
@@ -24,3 +27,43 @@
 .active__page {
   background: var(--primary-color) !important;
 } 
+
+@media screen and (max-width: 992px) {
+  .tour__page {
+    padding: 40px 0;
+  }
+
+  .pagination span {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .tour__page {
+    padding: 30px 0;
+  }
+
+  .tour__search-container {
+    margin-bottom: 30px;
+  }
+
+  .pagination {
+    column-gap: 0.5rem;
+  }
+
+  .pagination span {
+    padding: 5px 10px;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .tour__page {
+    padding: 20px 0;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+}

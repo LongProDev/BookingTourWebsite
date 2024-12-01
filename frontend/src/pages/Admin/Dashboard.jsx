@@ -9,6 +9,7 @@ import AdminTours from '../../components/Admin/AdminTours/Tours.jsx';
 import AdminUsers from '../../components/Admin/AdminUsers/Users.jsx';
 import AdminReviews from '../../components/Admin/AdminReviews/Reviews.jsx';
 import AdminStatistics from '../../components/Admin/AdminStatistics/Statistics.jsx';
+import AdminCustomers from '../../components/Admin/AdminCustomers/AdminCustomers.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -57,7 +58,10 @@ const Dashboard = () => {
           <Menu.Item key="4" onClick={() => navigate('/admin/reviews')}>
             Reviews
           </Menu.Item>
-          <Menu.Item key="5" onClick={() => navigate('/admin/statistics')}>
+          <Menu.Item key="5" onClick={() => navigate('/admin/customers')}>
+            Customers
+            </Menu.Item>
+          <Menu.Item key="6" onClick={() => navigate('/admin/statistics')}>
             Statistics
           </Menu.Item>
         </Menu>
@@ -69,6 +73,7 @@ const Dashboard = () => {
           <Route path="users" element={<AdminUsers />} />
           <Route path="reviews" element={<AdminReviews />} />
           <Route path="statistics" element={<AdminStatistics />} />
+          <Route path="customers" element={<AdminCustomers />} />
           <Route path="" element={<AdminStatistics />} />
         </Routes>
       </div>
