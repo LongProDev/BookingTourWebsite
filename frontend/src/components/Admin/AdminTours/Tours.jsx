@@ -16,6 +16,7 @@ import tourService from "../../../services/tourService";
 import "./tours.css";
 import { isFutureDateTime } from '../../../utils/dateUtils';
 import SortBox from "../../../shared/SortBox";
+import DescriptionColumn from "./DescriptionColumnLimit";
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '/images/placeholder.jpg';
@@ -605,8 +606,9 @@ const AdminTours = () => {
     }
 
     setTours(sortedTours);
-    setPage(0);
   };
+
+  
 
   return (
     <div className="admin-tours">
@@ -645,88 +647,91 @@ const AdminTours = () => {
               </tr>
             </thead>
             <tbody>
-              {getFilteredTours().map((tour, index) => (
-                <tr key={tour._id}>
-                  <td>{page * TOURS_PER_PAGE + index + 1}</td>
-                  <td>
-                    {tour.image && tour.image.length > 0 ? (
-                      <img
-                        src={getImageUrl(tour.image[0])}
-                        alt={tour.name}
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src="/placeholder.jpg"
-                        alt="Tour placeholder"
-                        style={{
-                          width: "100px",
-                          height: "100px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                  </td>
-                  <td>{tour.name}</td>
-                  <td>{tour.location}</td>
-                  <td>{tour.startLocation}</td>
-                  <td>{tour.time}</td>
-                  <td>${tour.price}</td>
-                  <td>{tour.description}</td>
-                  <td>{tour.featured ? "Yes" : "No"}</td>
-                  <td>{formatSchedules(tour.schedules)}</td>
-                  <td>
-                    <Button
-                      color="info"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => {
-                        setCurrentTour(tour);
-                        setFormData(tour);
-                        setModal(true);
-                      }}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      color="danger"
-                      size="sm"
-                      onClick={() => handleDelete(tour._id)}
-                    >
-                      Delete
-                    </Button>
-                    <Button
-                      color="success"
-                      size="sm"
-                      className="me-2"
-                      onClick={() => {
-                        if (!tour) {
-                          alert('Error: Tour data is missing');
-                          return;
-                        }
-                        setCurrentTour(tour);
-                        setEditScheduleId(null);
-                        setScheduleData({
-                          departureDate: "",
-                          departureTime: "",
-                          returnDate: "",
-                          returnTime: "",
-                          transportation: "",
-                          availableSeats: "",
-                        });
-                        setScheduleModal(true);
-                      }}
-                    >
-                      Add Schedule
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {getFilteredTours().map((tour, index) => (
+    <tr key={tour._id}>
+      <td>{page * TOURS_PER_PAGE + index + 1}</td>
+      <td>
+        {tour.image && tour.image.length > 0 ? (
+          <img
+            src={getImageUrl(tour.image[0])}
+            alt={tour.name}
+            style={{
+              width: "100px",
+              height: "100px",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <img
+            src="/placeholder.jpg"
+            alt="Tour placeholder"
+            style={{
+              width: "100px",
+              height: "100px",
+              objectFit: "cover",
+            }}
+          />
+        )}
+      </td>
+      <td>{tour.name}</td>
+      <td>{tour.location}</td>
+      <td>{tour.startLocation}</td>
+      <td>{tour.time}</td>
+      <td>${tour.price}</td>
+      <td>
+        <DescriptionColumn description={tour.description} />
+      </td>
+      <td>{tour.featured ? "Yes" : "No"}</td>
+      <td>{formatSchedules(tour.schedules)}</td>
+      <td>
+        <Button
+          color="info"
+          size="sm"
+          className="me-2"
+          onClick={() => {
+            setCurrentTour(tour);
+            setFormData(tour);
+            setModal(true);
+          }}
+        >
+          Edit
+        </Button>
+        <Button
+          color="danger"
+          size="sm"
+          onClick={() => handleDelete(tour._id)}
+        >
+          Delete
+        </Button>
+        <Button
+          color="success"
+          size="sm"
+          className="me-2"
+          onClick={() => {
+            if (!tour) {
+              alert("Error: Tour data is missing");
+              return;
+            }
+            setCurrentTour(tour);
+            setEditScheduleId(null);
+            setScheduleData({
+              departureDate: "",
+              departureTime: "",
+              returnDate: "",
+              returnTime: "",
+              transportation: "",
+              availableSeats: "",
+            });
+            setScheduleModal(true);
+          }}
+        >
+          Add Schedule
+        </Button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </Table>
 
           <div className="pagination d-flex align-items-center justify-content-center mt-4 gap-3">

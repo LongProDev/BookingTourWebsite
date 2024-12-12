@@ -17,7 +17,7 @@ import {
 } from "reactstrap";
 import tourService from "../../services/tourService";
 import "./tourDetails.css";
-import { isScheduleExpired, hasAvailableSeats } from '../../utils/dateUtils';
+import { isScheduleExpired, hasAvailableSeats } from "../../utils/dateUtils";
 
 const TourDetails = () => {
   const { id } = useParams();
@@ -167,18 +167,23 @@ const TourDetails = () => {
                 <div className="review-header">
                   <div className="reviewer-info">
                     <div className="reviewer-avatar">
-                      {review.userName ? review.userName.charAt(0).toUpperCase() : 'U'}
+                      {review.userName
+                        ? review.userName.charAt(0).toUpperCase()
+                        : "U"}
                     </div>
                     <div>
                       <div className="reviewer-name">
-                        {review.userName || 'Anonymous User'}
+                        {review.userName || "Anonymous User"}
                       </div>
                       <div className="review-date">
-                        {new Date(review.createdAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
+                        {new Date(review.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )}
                       </div>
                     </div>
                   </div>
@@ -186,15 +191,16 @@ const TourDetails = () => {
                     {"⭐".repeat(review.rating)}
                   </div>
                 </div>
-                <div className="review-content">
-                  {review.comment}
-                </div>
+                <div className="review-content">{review.comment}</div>
               </div>
             ))}
           </div>
         ) : (
           <div className="no-reviews">
-            <i className="ri-chat-3-line mb-2" style={{ fontSize: '1.5rem' }}></i>
+            <i
+              className="ri-chat-3-line mb-2"
+              style={{ fontSize: "1.5rem" }}
+            ></i>
             <p>No reviews yet. Be the first to review this tour!</p>
           </div>
         )}
@@ -204,7 +210,9 @@ const TourDetails = () => {
         <h5>Write a Review</h5>
         <Form onSubmit={handleReviewSubmit} className="review-form">
           <FormGroup className="mb-2">
-            <Label for="rating" className="mb-1">Rating</Label>
+            <Label for="rating" className="mb-1">
+              Rating
+            </Label>
             <Input
               type="select"
               name="rating"
@@ -223,13 +231,17 @@ const TourDetails = () => {
           </FormGroup>
 
           <FormGroup className="mb-2">
-            <Label for="comment" className="mb-1">Your Review</Label>
+            <Label for="comment" className="mb-1">
+              Your Review
+            </Label>
             <Input
               type="textarea"
               name="comment"
               id="comment"
               value={review.comment}
-              onChange={(e) => setReview({ ...review, comment: e.target.value })}
+              onChange={(e) =>
+                setReview({ ...review, comment: e.target.value })
+              }
               placeholder="Share your experience..."
               rows="3"
             />
@@ -243,10 +255,10 @@ const TourDetails = () => {
     </div>
   );
 
-  const isExpired = tour.schedules?.every(schedule => 
+  const isExpired = tour.schedules?.every((schedule) =>
     isScheduleExpired(schedule.departureDate, schedule.departureTime)
   );
-  
+
   const hasSeats = hasAvailableSeats(tour.schedules);
 
   return (
@@ -278,22 +290,36 @@ const TourDetails = () => {
                 <div className="tour-info mt-4">
                   <h2>{tour.name}</h2>
                   <h5>Description</h5>
-                  <div dangerouslySetInnerHTML={{ __html: tour.description }} />
+                  <div style={{ whiteSpace: "pre-wrap" }}>
+                    {tour.description}
+                  </div>
+
                   <div className="tour-schedules mt-4">
                     <h5>Available Schedules</h5>
                     {tour.schedules && tour.schedules.length > 0 ? (
                       <div className="schedules-list">
                         {tour.schedules.map((schedule, index) => {
-                          const expired = isScheduleExpired(schedule.departureDate, schedule.departureTime);
+                          const expired = isScheduleExpired(
+                            schedule.departureDate,
+                            schedule.departureTime
+                          );
                           return (
                             <div
                               key={schedule._id}
-                              className={`schedule-item p-3 mb-2 bg-light rounded ${expired ? 'expired' : ''}`}
+                              className={`schedule-item p-3 mb-2 bg-light rounded ${
+                                expired ? "expired" : ""
+                              }`}
                             >
-                              <h6>Schedule {index + 1} {expired && <span className="text-danger">(Expired)</span>}</h6>
+                              <h6>
+                                Schedule {index + 1}{" "}
+                                {expired && (
+                                  <span className="text-danger">(Expired)</span>
+                                )}
+                              </h6>
                               <div className="d-flex flex-wrap gap-3">
                                 <span>
-                                  <i className="ri-calendar-line"></i> Departure:{" "}
+                                  <i className="ri-calendar-line"></i>{" "}
+                                  Departure:{" "}
                                   {new Date(
                                     schedule.departureDate
                                   ).toLocaleDateString()}{" "}
@@ -308,8 +334,8 @@ const TourDetails = () => {
                                   at {schedule.returnTime}
                                 </span>
                                 <span>
-                                  <i className="ri-bus-line"></i> Transportation:{" "}
-                                  {schedule.transportation}
+                                  <i className="ri-bus-line"></i>{" "}
+                                  Transportation: {schedule.transportation}
                                 </span>
                                 <span>
                                   <i className="ri-user-line"></i> Available
@@ -349,8 +375,12 @@ const TourDetails = () => {
                   <span>/person</span>
                 </div>
                 {isExpired || !hasSeats ? (
-                  <Button className="w-100 mt-3 booking__btn" disabled style={{ backgroundColor: 'gray' }}>
-                    {!hasSeats ? 'Sold Out' : 'Expired'}
+                  <Button
+                    className="w-100 mt-3 booking__btn"
+                    disabled
+                    style={{ backgroundColor: "gray" }}
+                  >
+                    {!hasSeats ? "Sold Out" : "Expired"}
                   </Button>
                 ) : (
                   <Button className="w-100 mt-3 booking__btn">

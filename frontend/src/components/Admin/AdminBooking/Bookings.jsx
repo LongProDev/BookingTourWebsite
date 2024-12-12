@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Table, Button, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink, Input, FormGroup, Label, Row, Col } from 'reactstrap';
 import bookingService from '../../../services/bookingService';
 import './bookings.css';
@@ -21,6 +22,7 @@ const AdminBookings = () => {
   });
 
   const BOOKINGS_PER_PAGE = 8;
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     fetchBookings();
@@ -110,6 +112,10 @@ const AdminBookings = () => {
       [name]: value
     }));
     setCurrentPage(1);
+  };
+
+  const handleTourClick = (tourId) => {
+    navigate(`/tours/${tourId}`);
   };
 
   const searchSection = (
@@ -203,7 +209,14 @@ const AdminBookings = () => {
               <td>{booking.customerName}</td>
               <td>{booking.customerEmail}</td>
               <td>{booking.customerPhone}</td>
-              <td>{booking.tourName}</td>
+              <td>
+                <span
+                  className="text-primary cursor-pointer"
+                  onClick={() => handleTourClick(booking.tourId)} // Redirect to tour details
+                >
+                  {booking.tourName}
+                </span>
+              </td>
               <td>
                 Adults: {booking.numberOfAdults}<br/>
                 Children: {booking.numberOfChildren}
@@ -290,4 +303,4 @@ const AdminBookings = () => {
   );
 };
 
-export default AdminBookings; 
+export default AdminBookings;
