@@ -130,7 +130,7 @@ const DetailedStatistics = () => {
   if (loading) return <div className="loading-spinner">Loading...</div>;
 
   return (
-    <div className="detailed-statistics p-4">
+    <div className="detailed-statistics p-5">
       <h2 className="statistics-title mb-4">Dashboard Statistics</h2>
       <Row>
         <Col md={6} className="mb-4">

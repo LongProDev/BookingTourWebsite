@@ -55,7 +55,7 @@ const AdminReviews = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="admin-reviews">
+    <div className="admin-reviews p-5">
       <h2>Review Management</h2>
       <Table responsive>
         <thead>

@@ -15,6 +15,7 @@ import {
 import tourService from "../../../services/tourService";
 import "./tours.css";
 import { isFutureDateTime } from '../../../utils/dateUtils';
+import SortBox from "../../../shared/SortBox";
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '/images/placeholder.jpg';
@@ -169,6 +170,7 @@ const AdminTours = () => {
   const [pageCount, setPageCount] = useState(0);
   const [page, setPage] = useState(0);
   const TOURS_PER_PAGE = 8;
+  const [sortBy, setSortBy] = useState('newest');
   
   const [modal, setModal] = useState(false);
   const [currentTour, setCurrentTour] = useState(null);
@@ -573,6 +575,38 @@ const AdminTours = () => {
       </Row>
     </div>
   );
+  const handleSort = (value) => {
+    setSortBy(value);
+    let sortedTours = [...tours];
+
+    switch (value) {
+      case 'price-high':
+        sortedTours.sort((a, b) => b.price - a.price);
+        break;
+      case 'price-low':
+        sortedTours.sort((a, b) => a.price - b.price);
+        break;
+      case 'date-near':
+        sortedTours.sort((a, b) => {
+          const aDate = a.schedules && a.schedules.length > 0 
+            ? new Date(a.schedules[0].departureDate) 
+            : new Date(9999, 11, 31);
+          const bDate = b.schedules && b.schedules.length > 0 
+            ? new Date(b.schedules[0].departureDate) 
+            : new Date(9999, 11, 31);
+          return aDate - bDate;
+        });
+        break;
+      case 'newest':
+        sortedTours.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      default:
+        break;
+    }
+
+    setTours(sortedTours);
+    setPage(0);
+  };
 
   return (
     <div className="admin-tours">
@@ -581,15 +615,19 @@ const AdminTours = () => {
         <Button color="primary" onClick={() => setModal(true)}>
           Add New Tour
         </Button>
+  
       </div>
 
       {searchSection}
-
+      <div className="admin-sortbox">
+        <SortBox onSortChange={handleSort} currentSort={sortBy} />
+      </div>
       {loading && <div className="text-center">Loading...</div>}
       {error && <div className="text-center text-danger">{error}</div>}
       
       {!loading && !error && (
         <>
+        
           <Table responsive hover>
             <thead>
               <tr>

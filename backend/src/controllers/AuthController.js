@@ -1,7 +1,6 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import { sendPasswordResetEmail } from "../services/emailService.js";
-import crypto from 'crypto';
 
 const authController = {
   register: async (req, res) => {

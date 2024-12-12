@@ -178,7 +178,7 @@ const AdminBookings = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="admin-bookings p-4">
+    <div className="admin-bookings p-5">
       <h2>Bookings Management</h2>
       
       {searchSection}

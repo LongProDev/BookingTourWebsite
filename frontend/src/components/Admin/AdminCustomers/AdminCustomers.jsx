@@ -80,7 +80,7 @@ const AdminCustomers = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className="admin-customers p-4">
+    <div className="admin-customers p-5">
       <h2>Customer Management</h2>
 
       <div className="search-filters mb-4">

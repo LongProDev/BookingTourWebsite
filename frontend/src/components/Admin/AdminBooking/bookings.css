@@ -1,7 +1,9 @@
 .admin-bookings {
   max-width: 100%;
-  padding: 20px;
+  padding: 10px;
   font-size: 14px;
+  max-height: fit-content;
+  
 }
 
 .admin-bookings table {
@@ -29,37 +31,37 @@
 
 .admin-bookings th:nth-child(3), /* Phone */
 .admin-bookings td:nth-child(3) {
-  width: 10%;
+  width: 8%;
 }
 
 .admin-bookings th:nth-child(4), /* Tour Name */
 .admin-bookings td:nth-child(4) {
-  width: 12%;
+  width: 18%;
 }
 
 .admin-bookings th:nth-child(5), /* Passengers */
 .admin-bookings td:nth-child(5) {
-  width: 10%;
+  width: 7%;
 }
 
 .admin-bookings th:nth-child(6), /* Booking Time */
 .admin-bookings td:nth-child(6) {
-  width: 15%;
+  width: 13%;
 }
 
 .admin-bookings th:nth-child(7), /* Total Price */
 .admin-bookings td:nth-child(7) {
-  width: 8%;
+  width: 5%;
 }
 
 .admin-bookings th:nth-child(8), /* Status */
 .admin-bookings td:nth-child(8) {
-  width: 8%;
+  width: 6%;
 }
 
 .admin-bookings th:nth-child(9), /* Actions */
 .admin-bookings td:nth-child(9) {
-  width: 10%;
+  width: 7%;
 }
 
 /* Action buttons container */

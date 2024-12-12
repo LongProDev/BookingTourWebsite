@@ -4,10 +4,10 @@
 }
 
 .admin-sidebar {
-  width: 250px;
+  width: 200px;
   background-color: #fff;
   border-right: 1px solid #f0f0f0;
-  padding: 20px 0;
+  padding: 100px 0px;
   position: sticky;
   top: 0;
   height: 40vh;
