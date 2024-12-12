@@ -80,18 +80,18 @@
 }
 
 
-.admin-tours table td:nth-child(9) {
+.admin-tours table td:nth-child(10) {
   min-width: 200px;
   max-width: 300px;
   word-wrap: break-word;
 } 
-.admin-tours table td:nth-child(10) {
+.admin-tours table td:nth-child(11) {
   min-width: 80px;
   max-width: 100px;
   word-wrap: break-word;
   text-align: center;
 } 
-.admin-tours table td:nth-child(8) {
+.admin-tours table td:nth-child(9) {
   min-width: 20px;
   max-width: 100px;
   word-wrap: break-word;
@@ -105,15 +105,15 @@
   word-wrap: break-word;
   text-align: center;
 } 
-.admin-tours table td:nth-child(5) {
-  word-wrap: break-word;
-  text-align: center;
-} 
 .admin-tours table td:nth-child(6) {
   word-wrap: break-word;
   text-align: center;
 } 
 .admin-tours table td:nth-child(7) {
+  word-wrap: break-word;
+  text-align: center;
+} 
+.admin-tours table td:nth-child(8) {
   word-wrap: break-word;
   text-align: left;
 } 

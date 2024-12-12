@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Card, CardBody } from "reactstrap";
 import { Link } from "react-router-dom";
 import "./tour-card.css";
+import { isScheduleExpired, hasAvailableSeats } from '../utils/dateUtils';
 
 const TourCard = ({ tour }) => {
   const {
@@ -32,6 +33,12 @@ const TourCard = ({ tour }) => {
     console.error("Image failed to load:", imgSrc);
     setImgSrc("/images/placeholder.jpg");
   };
+
+  const isExpired = tour.schedules?.every(schedule => 
+    isScheduleExpired(schedule.departureDate, schedule.departureTime)
+  );
+
+  const hasSeats = hasAvailableSeats(tour.schedules);
 
   return (
     <div className="tour__card">
@@ -80,9 +87,15 @@ const TourCard = ({ tour }) => {
           </div>
 
           <div className="tour__info d-flex align-items-center gap-3">
-            <button className="btn booking__btn">
-              <Link to={`/tours/${_id}/booking`}>Book Now</Link>
-            </button>
+            {isExpired || !hasSeats ? (
+              <button className="btn booking__btn" disabled style={{ backgroundColor: 'gray' }}>
+                {!hasSeats ? 'Sold Out' : 'Expired'}
+              </button>
+            ) : (
+              <button className="btn booking__btn">
+                <Link to={`/tours/${_id}/booking`}>Book Now</Link>
+              </button>
+            )}
           </div>
         </div>
       </CardBody>

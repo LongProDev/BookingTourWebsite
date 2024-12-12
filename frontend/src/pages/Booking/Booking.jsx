@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
   Container,
   Row,
   Col,
@@ -15,6 +19,8 @@ import tourService from "../../services/tourService";
 import bookingService from "../../services/bookingService";
 import PaymentGateway from "../../pages/Payment/PaymentGateway";
 import { toast } from "react-hot-toast";
+import { isScheduleExpired } from '../../utils/dateUtils';
+import NotificationModal from '../../components/NotificationModal/NotificationModal';
 
 const Booking = () => {
   const { id } = useParams();
@@ -37,6 +43,8 @@ const Booking = () => {
     totalPrice: 0,
   });
   const [bookingData] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   // Fetch tour data
   useEffect(() => {
@@ -69,21 +77,33 @@ const Booking = () => {
     return adultTotal + childTotal;
   };
 
-  // Update the form data when number of passengers changes
+  const validateSeats = (adults, children, schedule) => {
+    const totalRequested = adults + children;
+    if (!schedule) return false;
+    
+    if (schedule.availableSeats < totalRequested) {
+      setModalMessage(`Sorry, there are only ${schedule.availableSeats} seats available for this schedule.`);
+      setModalOpen(true);
+      return false;
+    }
+    return true;
+  };
+
   const handlePassengerChange = (type, value) => {
-    const adults =
-      type === "adults" ? parseInt(value) : formData.numberOfAdults;
-    const children =
-      type === "children" ? parseInt(value) : formData.numberOfChildren;
+    const adults = type === "adults" ? parseInt(value) : formData.numberOfAdults;
+    const children = type === "children" ? parseInt(value) : formData.numberOfChildren;
 
     if (!selectedSchedule) return;
+
+    if (!validateSeats(adults, children, selectedSchedule)) {
+      return;
+    }
 
     const subtotal = calculateTotalPrice(adults, children, tour.price);
 
     setFormData((prev) => ({
       ...prev,
-      [type === "adults" ? "numberOfAdults" : "numberOfChildren"]:
-        parseInt(value),
+      [type === "adults" ? "numberOfAdults" : "numberOfChildren"]: parseInt(value),
       subtotal: subtotal,
       totalPrice: subtotal - prev.discount,
     }));
@@ -168,18 +188,22 @@ const Booking = () => {
                   required
                 >
                   <option value="">Select a schedule</option>
-                  {tour.schedules.map((schedule) => (
-                    <option
-                      key={schedule._id}
-                      value={schedule._id}
-                      disabled={schedule.availableSeats === 0}
-                    >
-                      Departure: {new Date(schedule.departureDate).toLocaleDateString()} -
-                      Transportation: {schedule.transportation} -
-                      Departure Time: {schedule.departureTime} -
-                      Available Seats: {schedule.availableSeats}
-                    </option>
-                  ))}
+                  {tour.schedules.map((schedule) => {
+                    const expired = isScheduleExpired(schedule.departureDate, schedule.departureTime);
+                    return (
+                      <option
+                        key={schedule._id}
+                        value={schedule._id}
+                        disabled={expired || schedule.availableSeats === 0}
+                      >
+                        Departure: {new Date(schedule.departureDate).toLocaleDateString()} -
+                        Transportation: {schedule.transportation} -
+                        Departure Time: {schedule.departureTime} -
+                        Available Seats: {schedule.availableSeats}
+                        {expired ? ' (Expired)' : ''}
+                      </option>
+                    );
+                  })}
                 </Input>
               </FormGroup>
 
@@ -379,6 +403,11 @@ const Booking = () => {
         </Row>
       </Container>
       {bookingData && <PaymentGateway bookingData={bookingData} />}
+      <NotificationModal 
+        isOpen={modalOpen}
+        toggle={() => setModalOpen(false)}
+        message={modalMessage}
+      />
     </section>
   );
 };

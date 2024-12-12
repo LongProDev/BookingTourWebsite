@@ -14,6 +14,7 @@ import {
 } from "reactstrap";
 import tourService from "../../../services/tourService";
 import "./tours.css";
+import { isFutureDateTime } from '../../../utils/dateUtils';
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '/images/placeholder.jpg';
@@ -304,6 +305,16 @@ const AdminTours = () => {
   const handleScheduleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Validate departure date and time
+      const isValidDateTime = isFutureDateTime(
+        scheduleData.departureDate,
+        scheduleData.departureTime
+      );
+
+      if (!isValidDateTime) {
+        throw new Error('Departure date and time must be in the future');
+      }
+
       if (!currentTour || !currentTour._id) {
         throw new Error('Invalid tour data. Please try again.');
       }
@@ -586,6 +597,7 @@ const AdminTours = () => {
                 <th>Image</th>
                 <th>Name</th>
                 <th>Location</th>
+                <th>Departure Location</th>
                 <th>Itinerary</th>
                 <th>Price</th>
                 <th>Description</th>
@@ -623,6 +635,7 @@ const AdminTours = () => {
                   </td>
                   <td>{tour.name}</td>
                   <td>{tour.location}</td>
+                  <td>{tour.startLocation}</td>
                   <td>{tour.time}</td>
                   <td>${tour.price}</td>
                   <td>{tour.description}</td>

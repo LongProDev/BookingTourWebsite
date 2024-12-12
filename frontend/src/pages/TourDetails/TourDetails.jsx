@@ -17,6 +17,7 @@ import {
 } from "reactstrap";
 import tourService from "../../services/tourService";
 import "./tourDetails.css";
+import { isScheduleExpired, hasAvailableSeats } from '../../utils/dateUtils';
 
 const TourDetails = () => {
   const { id } = useParams();
@@ -242,6 +243,12 @@ const TourDetails = () => {
     </div>
   );
 
+  const isExpired = tour.schedules?.every(schedule => 
+    isScheduleExpired(schedule.departureDate, schedule.departureTime)
+  );
+  
+  const hasSeats = hasAvailableSeats(tour.schedules);
+
   return (
     <>
       <section className="tour-details">
@@ -276,39 +283,42 @@ const TourDetails = () => {
                     <h5>Available Schedules</h5>
                     {tour.schedules && tour.schedules.length > 0 ? (
                       <div className="schedules-list">
-                        {tour.schedules.map((schedule, index) => (
-                          <div
-                            key={schedule._id}
-                            className="schedule-item p-3 mb-2 bg-light rounded"
-                          >
-                            <h6>Schedule {index + 1}</h6>
-                            <div className="d-flex flex-wrap gap-3">
-                              <span>
-                                <i className="ri-calendar-line"></i> Departure:{" "}
-                                {new Date(
-                                  schedule.departureDate
-                                ).toLocaleDateString()}{" "}
-                                at {schedule.departureTime}
-                              </span>
-                              <span>
-                                <i className="ri-calendar-check-line"></i>{" "}
-                                Return:{" "}
-                                {new Date(
-                                  schedule.returnDate
-                                ).toLocaleDateString()}{" "}
-                                at {schedule.returnTime}
-                              </span>
-                              <span>
-                                <i className="ri-bus-line"></i> Transportation:{" "}
-                                {schedule.transportation}
-                              </span>
-                              <span>
-                                <i className="ri-user-line"></i> Available
-                                Seats: {schedule.availableSeats}
-                              </span>
+                        {tour.schedules.map((schedule, index) => {
+                          const expired = isScheduleExpired(schedule.departureDate, schedule.departureTime);
+                          return (
+                            <div
+                              key={schedule._id}
+                              className={`schedule-item p-3 mb-2 bg-light rounded ${expired ? 'expired' : ''}`}
+                            >
+                              <h6>Schedule {index + 1} {expired && <span className="text-danger">(Expired)</span>}</h6>
+                              <div className="d-flex flex-wrap gap-3">
+                                <span>
+                                  <i className="ri-calendar-line"></i> Departure:{" "}
+                                  {new Date(
+                                    schedule.departureDate
+                                  ).toLocaleDateString()}{" "}
+                                  at {schedule.departureTime}
+                                </span>
+                                <span>
+                                  <i className="ri-calendar-check-line"></i>{" "}
+                                  Return:{" "}
+                                  {new Date(
+                                    schedule.returnDate
+                                  ).toLocaleDateString()}{" "}
+                                  at {schedule.returnTime}
+                                </span>
+                                <span>
+                                  <i className="ri-bus-line"></i> Transportation:{" "}
+                                  {schedule.transportation}
+                                </span>
+                                <span>
+                                  <i className="ri-user-line"></i> Available
+                                  Seats: {schedule.availableSeats}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     ) : (
                       <p>No schedules available for this tour.</p>
@@ -338,14 +348,20 @@ const TourDetails = () => {
                   <h4>${tour.price}</h4>
                   <span>/person</span>
                 </div>
-                <Button className="w-100 mt-3 booking__btn">
-                  <Link
-                    to={`/tours/${tour._id}/booking`}
-                    style={{ color: "white", textDecoration: "none" }}
-                  >
-                    Book Now
-                  </Link>
-                </Button>
+                {isExpired || !hasSeats ? (
+                  <Button className="w-100 mt-3 booking__btn" disabled style={{ backgroundColor: 'gray' }}>
+                    {!hasSeats ? 'Sold Out' : 'Expired'}
+                  </Button>
+                ) : (
+                  <Button className="w-100 mt-3 booking__btn">
+                    <Link
+                      to={`/tours/${tour._id}/booking`}
+                      style={{ color: "white", textDecoration: "none" }}
+                    >
+                      Book Now
+                    </Link>
+                  </Button>
+                )}
               </div>
             </Col>
           </Row>
