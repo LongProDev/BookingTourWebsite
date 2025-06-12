@@ -46,6 +46,22 @@ const bookingController = {
     }
   },
 
+  getBookingsBySchedule: async (req, res) => {
+    try {
+      const { scheduleId } = req.params;
+      const bookings = await Booking.find({ scheduleId });
+      res.status(200).json({
+        success: true,
+        data: bookings
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   // Create new booking
   createBooking: async (req, res) => {
     try {

@@ -19,6 +19,12 @@ const bookingService = {
     return response.data;
   },
 
+  getBookingsBySchedule : async (scheduleId) => {
+    const response = await axios.get(`/api/bookings/schedule/${scheduleId}`);
+    return response.data.data; 
+  },
+  
+
   createBooking: async (bookingData) => {
     try {
       const response = await api.post('/bookings', bookingData);

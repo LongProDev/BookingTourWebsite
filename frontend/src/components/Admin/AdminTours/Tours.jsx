@@ -17,6 +17,7 @@ import "./tours.css";
 import { isFutureDateTime } from '../../../utils/dateUtils';
 import SortBox from "../../../shared/SortBox";
 import DescriptionColumn from "./DescriptionColumnLimit";
+import bookingService from "../../../services/bookingService";
 
 const getImageUrl = (imagePath) => {
   if (!imagePath) return '/images/placeholder.jpg';
@@ -475,17 +476,25 @@ const AdminTours = () => {
 
   const handleDeleteSchedule = async (tourId, scheduleId) => {
     if (!window.confirm('Are you sure you want to delete this schedule?')) return;
-
+  
     try {
+      // Kiểm tra xem Schedule có liên quan đến bất kỳ booking nào không
+      const relatedBookings = await bookingService.getBookingsBySchedule(scheduleId);
+      if (relatedBookings.length > 0) {
+        alert('This schedule cannot be deleted as it has associated bookings.');
+        return;
+      }
+  
+      // Nếu không có booking nào liên quan, tiếp tục xóa Schedule
       const updatedSchedules = currentTour.schedules.filter(
         schedule => schedule._id !== scheduleId
       );
-
+  
       const updatedTour = {
         ...currentTour,
         schedules: JSON.stringify(updatedSchedules)
       };
-
+  
       const response = await tourService.updateTour(tourId, updatedTour);
       if (response.success) {
         fetchTours();
@@ -498,7 +507,7 @@ const AdminTours = () => {
       alert(error.message || 'Failed to delete schedule');
     }
   };
-
+  
   const handleEditSchedule = (schedule) => {
     setEditScheduleId(schedule._id);
     setScheduleData({

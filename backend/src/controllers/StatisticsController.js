@@ -28,7 +28,7 @@ const StatisticsController = {
           $group: { // Nhóm các tài liệu theo năm và tháng
             _id: { 
               year: { $year: '$createdAt' }, 
-              month: { $month: '$createdAt' } 
+              month: { $month: '$createdAt' },
             },
             count: { $sum: 1 } // Đếm số lượng tài liệu trong mỗi nhóm
           }
@@ -60,7 +60,7 @@ const StatisticsController = {
       ]);
 
       // Lấy doanh thu hàng tháng
-      const monthlyRevenue = await Booking.aggregate([ // Sử dụng phương thức aggregate của mô hình Booking
+      const monthlyRevenue = await Booking.aggregate([ 
         {
           $match: { // Lọc các tài liệu theo điều kiện
             createdAt: { 
@@ -83,7 +83,7 @@ const StatisticsController = {
       ]);
 
       // Lấy số lượng tour mới được tạo
-      const newTours = await Tour.aggregate([ // Sử dụng phương thức aggregate của mô hình Tour
+      const newTours = await Tour.aggregate([ 
         {
           $match: { // Lọc các tài liệu theo điều kiện
             createdAt: { 

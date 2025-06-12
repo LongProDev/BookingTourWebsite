@@ -172,9 +172,6 @@ const TourDetails = () => {
                         : "U"}
                     </div>
                     <div>
-                      <div className="reviewer-name">
-                        {review.userName || "Anonymous User"}
-                      </div>
                       <div className="review-date">
                         {new Date(review.createdAt).toLocaleDateString(
                           "en-US",

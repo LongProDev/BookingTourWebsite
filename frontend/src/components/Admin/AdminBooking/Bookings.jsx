@@ -1,8 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { Table, Button, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Pagination, PaginationItem, PaginationLink, Input, FormGroup, Label, Row, Col } from 'reactstrap';
-import bookingService from '../../../services/bookingService';
-import './bookings.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
+import {
+  Table,
+  Button,
+  Badge,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
+  Input,
+  FormGroup,
+  Label,
+  Row,
+  Col,
+} from "reactstrap";
+import bookingService from "../../../services/bookingService";
+import "./bookings.css";
 
 const AdminBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -12,13 +28,13 @@ const AdminBookings = () => {
     isOpen: false,
     type: null,
     bookingId: null,
-    newStatus: null
+    newStatus: null,
   });
   const [searchFilters, setSearchFilters] = useState({
-    customerName: '',
-    customerEmail: '',
-    customerPhone: '',
-    tourStatus: ''
+    customerName: "",
+    customerEmail: "",
+    customerPhone: "",
+    tourStatus: "",
   });
 
   const BOOKINGS_PER_PAGE = 8;
@@ -28,17 +44,19 @@ const AdminBookings = () => {
     fetchBookings();
   }, []);
 
+  const statusBooking = ["Pending", "Paid", "Completed"]; 
+
   const fetchBookings = async () => {
     try {
       const response = await bookingService.getAllBookings();
-      const sortedBookings = (response.data || []).sort((a, b) => 
-        new Date(b.bookingDate) - new Date(a.bookingDate)
+      const sortedBookings = (response.data || []).sort(
+        (a, b) => statusBooking.indexOf(a.tourStatus) - statusBooking.indexOf(b.tourStatus)
       );
       setBookings(sortedBookings);
     } catch (error) {
-      console.error('Error fetching bookings:', error);
-      if (error.message.includes('authentication')) {
-        window.location.href = '/login';
+      console.error("Error fetching bookings:", error);
+      if (error.message.includes("authentication")) {
+        window.location.href = "/login";
       }
       setBookings([]);
     } finally {
@@ -47,51 +65,65 @@ const AdminBookings = () => {
   };
 
   const toggleModal = () => {
-    setModal(prev => ({
+    setModal((prev) => ({
       ...prev,
-      isOpen: !prev.isOpen
+      isOpen: !prev.isOpen,
     }));
   };
 
   const handleStatusUpdateClick = (id, newStatus) => {
     setModal({
       isOpen: true,
-      type: 'status',
+      type: "status",
       bookingId: id,
-      newStatus: newStatus
+      newStatus: newStatus,
     });
   };
 
   const handleDeleteClick = (id) => {
     setModal({
       isOpen: true,
-      type: 'delete',
+      type: "delete",
       bookingId: id,
-      newStatus: null
+      newStatus: null,
     });
   };
 
   const handleConfirm = async () => {
     try {
-      if (modal.type === 'status') {
-        await bookingService.updateBooking(modal.bookingId, { tourStatus: modal.newStatus });
-      } else if (modal.type === 'delete') {
+      if (modal.type === "status") {
+        await bookingService.updateBooking(modal.bookingId, {
+          tourStatus: modal.newStatus,
+        });
+      } else if (modal.type === "delete") {
         await bookingService.deleteBooking(modal.bookingId);
       }
       fetchBookings();
       toggleModal();
     } catch (error) {
-      console.error('Error:', error);
-      alert(`Failed to ${modal.type === 'delete' ? 'delete booking' : 'update booking status'}`);
+      console.error("Error:", error);
+      alert(
+        `Failed to ${
+          modal.type === "delete" ? "delete booking" : "update booking status"
+        }`
+      );
     }
   };
 
   const getFilteredBookings = () => {
-    return bookings.filter(booking => {
-      const nameMatch = booking.customerName.toLowerCase().includes(searchFilters.customerName.toLowerCase());
-      const emailMatch = booking.customerEmail.toLowerCase().includes(searchFilters.customerEmail.toLowerCase());
-      const phoneMatch = booking.customerPhone.includes(searchFilters.customerPhone);
-      const statusMatch = !searchFilters.tourStatus || booking.tourStatus === searchFilters.tourStatus;
+    return bookings.filter((booking) => {
+      const nameMatch = booking.customerName
+        .toLowerCase()
+        .includes(searchFilters.customerName.toLowerCase());
+      const emailMatch = booking.customerEmail
+        .toLowerCase()
+        .includes(searchFilters.customerEmail.toLowerCase());
+      const phoneMatch = booking.customerPhone.includes(
+        searchFilters.customerPhone
+      );
+      const statusMatch =
+        !searchFilters.tourStatus ||
+        booking.tourStatus === searchFilters.tourStatus;
 
       return nameMatch && emailMatch && phoneMatch && statusMatch;
     });
@@ -100,16 +132,19 @@ const AdminBookings = () => {
   const filteredBookings = getFilteredBookings();
   const indexOfLastBooking = currentPage * BOOKINGS_PER_PAGE;
   const indexOfFirstBooking = indexOfLastBooking - BOOKINGS_PER_PAGE;
-  const currentBookings = filteredBookings.slice(indexOfFirstBooking, indexOfLastBooking);
+  const currentBookings = filteredBookings.slice(
+    indexOfFirstBooking,
+    indexOfLastBooking
+  );
   const totalPages = Math.ceil(filteredBookings.length / BOOKINGS_PER_PAGE);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const handleSearchChange = (e) => {
     const { name, value } = e.target;
-    setSearchFilters(prev => ({
+    setSearchFilters((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     setCurrentPage(1);
   };
@@ -171,6 +206,7 @@ const AdminBookings = () => {
               onChange={handleSearchChange}
             >
               <option value="">All Status</option>
+              <option value="Pending"></option>
               <option value="Paid">Paid</option>
               <option value="Completed">Completed</option>
               <option value="Canceled">Canceled</option>
@@ -181,12 +217,13 @@ const AdminBookings = () => {
     </div>
   );
 
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="admin-bookings p-5">
       <h2>Bookings Management</h2>
-      
+
       {searchSection}
 
       <Table responsive>
@@ -218,16 +255,22 @@ const AdminBookings = () => {
                 </span>
               </td>
               <td>
-                Adults: {booking.numberOfAdults}<br/>
+                Adults: {booking.numberOfAdults}
+                <br />
                 Children: {booking.numberOfChildren}
               </td>
               <td>{new Date(booking.bookingDate).toLocaleString()}</td>
               <td>${booking.totalPrice}</td>
               <td>
-                <Badge color={
-                  booking.tourStatus === 'Paid' ? 'primary' :
-                  booking.tourStatus === 'Completed' ? 'success' : 'warning'
-                }>
+                <Badge
+                  color={
+                    booking.tourStatus === "Paid"
+                      ? "primary"
+                      : booking.tourStatus === "Completed"
+                      ? "success"
+                      : "warning"
+                  }
+                >
                   {booking.tourStatus}
                 </Badge>
               </td>
@@ -236,16 +279,20 @@ const AdminBookings = () => {
                   <Button
                     color="success"
                     size="sm"
-                    onClick={() => handleStatusUpdateClick(booking._id, 'Completed')}
-                    disabled={booking.tourStatus === 'Completed'}
+                    onClick={() =>
+                      handleStatusUpdateClick(booking._id, "Completed")
+                    }
+                    disabled={booking.tourStatus === "Completed"}
                   >
                     Complete
                   </Button>
                   <Button
                     color="warning"
                     size="sm"
-                    onClick={() => handleStatusUpdateClick(booking._id, 'Canceled')}
-                    disabled={booking.tourStatus === 'Canceled'}
+                    onClick={() =>
+                      handleStatusUpdateClick(booking._id, "Canceled")
+                    }
+                    disabled={booking.tourStatus === "Canceled"}
                   >
                     Cancel
                   </Button>
@@ -266,7 +313,10 @@ const AdminBookings = () => {
       <div className="d-flex justify-content-center mt-4">
         <Pagination>
           <PaginationItem disabled={currentPage === 1}>
-            <PaginationLink previous onClick={() => paginate(currentPage - 1)} />
+            <PaginationLink
+              previous
+              onClick={() => paginate(currentPage - 1)}
+            />
           </PaginationItem>
 
           {[...Array(totalPages)].map((_, index) => (
@@ -286,9 +336,9 @@ const AdminBookings = () => {
       <Modal isOpen={modal.isOpen} toggle={toggleModal}>
         <ModalHeader toggle={toggleModal}>Confirm Action</ModalHeader>
         <ModalBody>
-          {modal.type === 'status' 
+          {modal.type === "status"
             ? `Are you sure you want to mark this booking as ${modal.newStatus?.toLowerCase()}?`
-            : 'Are you sure you want to delete this booking?'}
+            : "Are you sure you want to delete this booking?"}
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleConfirm}>
